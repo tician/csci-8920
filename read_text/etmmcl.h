@@ -8,10 +8,8 @@
 using namespace cv;
 using namespace std;
 
-
-class ETMMCL_Tag
+typedef struct
 {
-public:
 	ETMMCL_Tag()
 	: time(0)
 	, name("")
@@ -20,25 +18,59 @@ public:
 	, w(0.0)
 	{}
 
-private:
 	uint64_t			time;		// Timestamp (creation)
 	string				tag;		// Text tag
 	int64_t			x,y;		// (X,Y) position
 	double				w;			// weight/confidence?
-public:
 
-	void read(const FileNode& node);
-	void write(FileStorage& fs) const;
-};
+	void read(const FileNode& node)
+	{
+		node["Timestamp"]	>> time;
+		node["TagText"]		>> name;
+		node["Position_X"]	>> x;
+		node["Position_Y"]	>> y;
+		node["Weight"]		>> w;
+	}
+
+	void write(FileStorage& fs) const
+	{
+		fs	<< "{"
+			<< "Timestamp"		<< time
+			<< "TagText"		<< name
+			<< "Position_X"		<< x
+			<< "Position_Y"		<< y
+			<< "Weight"			<< w
+			<< "}";
+	}
+
+} ETMMCL_Tag;
+
+static void write(FileStorage& fs, const std::string&, const ETMMCL_Tag& x)
+{
+    x.write(fs);
+}
+
+static void read(const FileNode& node, ETMMCL_Tag& x, const ETMMCL_Tag& default_value = ETMMCL_Tag()){
+    if(node.empty())
+        x = default_value;
+    else
+        x.read(node);
+}
+
 
 class ETMMCL_TagList
 {
 private:
-	uint64_t			n_;			// Number of tag_points in list
-	Vector<ETMMCL_Tag>	t_;			// Vector of tag_points
+	string				name;		// Name of TagList
+	uint64_t			n;			// Number of tags in list
+	Vector<ETMMCL_Tag>	t;			// Vector of tags
 
 public:
-	uint64_t ETMMCL_TagList(string);
+	uint64_t ETMMCL_TagList(string str)
+	: name(str)
+	, n(0)
+	, t()
+	{}
 
 	void write(FileStorage&);
 	void read(FileNode&);

@@ -1,5 +1,5 @@
 #include "etmmcl.h"
-
+/*
 void ETMMCL_Tag::write(FileStorage& fs) const
 {
 	fs	<< "{"
@@ -11,7 +11,7 @@ void ETMMCL_Tag::write(FileStorage& fs) const
 		<< "}";
 }
 
-tag_t ETMMCL_TagList::read(const FileNode& node)
+tag_t ETMMCL_Tag::read(const FileNode& node)
 {
 	uint64_t iter, n;
 	node["NumberTags"] >> n;
@@ -21,7 +21,7 @@ tag_t ETMMCL_TagList::read(const FileNode& node)
 	}
 }
 
-
+*/
 
 uint64_t ETMMCL_TagList::ETMMCL_TagList(string floorname)
 {
