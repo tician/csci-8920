@@ -10,6 +10,7 @@ const char* WIN_DOH = "Yum, donuts";
 const char* WIN_DER = "Holy macaroni";
 
 /*
+// For v2.4.9+ and not v2.3.1 or v2.4.4
 const std::string keys =
     "{help h usage ? |      | print this message   }"
     "{@image1        |      | image1 for compare   }"
@@ -48,6 +49,7 @@ const std::string keys =
 	}
 
 */
+// good for v2.4.4 and earlier
 const char* keys =
 {
 	"{cal            |      | video calibration file}"

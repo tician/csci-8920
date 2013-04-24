@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="run_detection.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="1128" topLine="78" />
+	</File>
+	<File name="text_detect.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="21028" topLine="863" />
+	</File>
+</CodeBlocks_layout_file>
