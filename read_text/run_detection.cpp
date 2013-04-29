@@ -16,6 +16,79 @@ int main(int argc, char* argv[])
 {
 	string filename = "./tempy.xml";
 
+	ETMMCL_Map mapper("test");
+
+	ETMMCL_TagList lister("primary");
+
+	{
+	FileStorage fs(filename, FileStorage::WRITE);
+	ETMMCL_Tag tagster;
+
+	for (int iter=0; iter<5; iter++)
+	{
+		int r= system("uuidgen >> output");
+		fstream fin("output");
+		getline(fin, tagster.uuid);
+		r = system("rm output");
+		tagster.time = iter+1;
+
+		lister.add(tagster);
+	}
+
+//	fs << lister.name << lister;
+	mapper.update("primary", lister);
+
+
+
+	lister.purge("");
+
+	lister.name = "secondary";
+
+	for (int iter=0; iter<5; iter++)
+	{
+		int r= system("uuidgen >> output");
+		fstream fin("output");
+		getline(fin, tagster.uuid);
+		r = system("rm output");
+		tagster.time = iter+1;
+
+		lister.add(tagster);
+	}
+
+//	fs << lister.name << lister;
+	mapper.update("secondary", lister);
+
+
+	lister.purge("");
+
+	lister.name = "tertiary";
+
+	for (int iter=0; iter<5; iter++)
+	{
+		int r= system("uuidgen >> output");
+		fstream fin("output");
+		getline(fin, tagster.uuid);
+		r = system("rm output");
+		tagster.time = iter+1;
+
+		lister.add(tagster);
+	}
+
+//	fs << lister.name << lister;
+	mapper.update("tertiary", lister);
+
+
+
+	fs << mapper.check() << mapper;
+
+
+	}
+
+
+
+	return 0;
+
+/*
 	{
 	FileStorage fs(filename, FileStorage::WRITE);
 
@@ -51,6 +124,7 @@ int main(int argc, char* argv[])
 	cout << "length: " << custer.num << endl;
 	}
 
+*/
 	return 0;
 
 /*

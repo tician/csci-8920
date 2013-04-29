@@ -17,14 +17,8 @@ using namespace std;
 class ETMMCL_Tag
 {
 public:
-	ETMMCL_Tag()
-	: uuid()
-	, time(0)
-	, tag()
-	, x(0)
-	, y(0)
-	, w(0.0)
-	{}
+	ETMMCL_Tag(string,string);
+	ETMMCL_Tag(void);
 
 // Only (int, float, double and string) are permitted with filestorage (writeScalar() not yet implemented for others)
 
@@ -75,6 +69,9 @@ public:
 
 	Vector<ETMMCL_Tag> get(string);
 	int add(ETMMCL_Tag);
+	int purge(string);
+	int remove(string);
+
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -99,6 +96,10 @@ static void read(const FileNode& node, ETMMCL_TagList& x, const ETMMCL_TagList& 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class ETMMCL_Map
 {
+public:
+	ETMMCL_Map(string);
+	ETMMCL_Map(void);
+
 private:
 	string				name_;		// Floorplan name
 	Mat					map_;		// Map of floor
@@ -111,12 +112,15 @@ private:
 	ETMMCL_TagList		ter_;		// Tertiary (auto-set) TagList
 
 public:
-	int add(ETMMCL_Tag);
+	int update(string, ETMMCL_TagList);
+//	int add(ETMMCL_Tag);
 	int purge(string, string);
 	int remove(string, string);
 
 	void write(FileStorage&) const;
 	void read(const FileNode&);
+
+	string check(void) {return name_;}
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -166,7 +170,7 @@ private:
 public:
 	int load(string str)	{return pull_floorplan(str);}
 	int update(void)		{return push_floorplan();}
-	string check(void)		{return map_.name;}
+	string check(void)		{return cmap_.name;}
 
 
 };
