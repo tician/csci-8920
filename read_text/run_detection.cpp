@@ -15,74 +15,84 @@ const char* WIN_DER = "Holy macaroni";
 int main(int argc, char* argv[])
 {
 	string filename = "./tempy.xml";
+	int iter, r;
 
 	ETMMCL_Map mapper("test");
 
-	ETMMCL_TagList lister("primary");
+	ETMMCL_TagList *lister;
 
-	{
 	FileStorage fs(filename, FileStorage::WRITE);
+
 	ETMMCL_Tag tagster;
 
-	for (int iter=0; iter<5; iter++)
+	lister = new ETMMCL_TagList("primary");
+
+	for (iter=0; iter<5; iter++)
 	{
-		int r= system("uuidgen >> output");
+		r = system("uuidgen >> output");
 		fstream fin("output");
 		getline(fin, tagster.uuid);
+		fin.close();
 		r = system("rm output");
 		tagster.time = iter+1;
 
-		lister.add(tagster);
+		lister->add(tagster);
 	}
 
-//	fs << lister.name << lister;
-	mapper.update("primary", lister);
+
+	r = mapper.update("primary", *lister);
+	assert( r == iter );
 
 
 
-	lister.purge("");
+	delete lister;
+	lister = new ETMMCL_TagList("secondary");
 
-	lister.name = "secondary";
 
-	for (int iter=0; iter<5; iter++)
+	for (iter=0; iter<7; iter++)
 	{
-		int r= system("uuidgen >> output");
+		r= system("uuidgen >> output");
 		fstream fin("output");
 		getline(fin, tagster.uuid);
+		fin.close();
 		r = system("rm output");
 		tagster.time = iter+1;
 
-		lister.add(tagster);
+		lister->add(tagster);
 	}
 
-//	fs << lister.name << lister;
-	mapper.update("secondary", lister);
+	r = mapper.update("secondary", *lister);
+	assert( r == iter );
 
 
-	lister.purge("");
+// purge does not work
+//	cout << lister.purge("") << endl;
 
-	lister.name = "tertiary";
 
-	for (int iter=0; iter<5; iter++)
+	delete lister;
+	lister = new ETMMCL_TagList("tertiary");
+
+
+	for (iter=0; iter<3; iter++)
 	{
-		int r= system("uuidgen >> output");
+		r= system("uuidgen >> output");
 		fstream fin("output");
 		getline(fin, tagster.uuid);
+		fin.close();
 		r = system("rm output");
 		tagster.time = iter+1;
 
-		lister.add(tagster);
+		lister->add(tagster);
 	}
 
-//	fs << lister.name << lister;
-	mapper.update("tertiary", lister);
+	r = mapper.update("tertiary", *lister);
+	assert( r == iter );
 
 
 
 	fs << mapper.check() << mapper;
 
 
-	}
 
 
 

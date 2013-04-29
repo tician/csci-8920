@@ -62,12 +62,12 @@ public:
 
 	string				name;		// Name of TagList
 	int					num;		// Number of tags in list
-	Vector<ETMMCL_Tag>	tags;		// Vector of tags
+	vector<ETMMCL_Tag>	tags;		// Vector of tags
 
 	void write(FileStorage&) const;
 	void read(const FileNode&);
 
-	Vector<ETMMCL_Tag> get(string);
+	vector<ETMMCL_Tag> get(string);
 	int add(ETMMCL_Tag);
 	int purge(string);
 	int remove(string);
@@ -170,7 +170,7 @@ private:
 public:
 	int load(string str)	{return pull_floorplan(str);}
 	int update(void)		{return push_floorplan();}
-	string check(void)		{return cmap_.name;}
+	string check(void)		{return cmap_.check();}
 
 
 };

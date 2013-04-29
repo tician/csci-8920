@@ -120,11 +120,11 @@ void ETMMCL_TagList::read(const FileNode& node)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Vector<ETMMCL_Tag> ETMMCL_TagList::get(string str)
+vector<ETMMCL_Tag> ETMMCL_TagList::get(string str)
 {
-	Vector<ETMMCL_Tag> matches;
-	Vector<ETMMCL_Tag>::iterator head = tags.begin();
-	Vector<ETMMCL_Tag>::iterator tail = tags.end();
+	vector<ETMMCL_Tag> matches;
+	vector<ETMMCL_Tag>::iterator head = tags.begin();
+	vector<ETMMCL_Tag>::iterator tail = tags.end();
 	while (head != tail)
 	{
 		if (head->tag == str)
@@ -175,8 +175,8 @@ int ETMMCL_TagList::purge(string tacky)
 	for (iter=0; iter<n; iter++)
 	{
 		// decreasing length of vector when erasing
-		assert( (indices[iter]-iter) < tags.size() );
-		tags.erase(tags.begin() + (indices[iter]-iter) );
+		assert( (indicies[iter]-iter) < tags.size() );
+		tags.erase(tags.begin() + (indicies[iter]-iter) );
 	}
 
 	return n;
@@ -203,6 +203,7 @@ int ETMMCL_TagList::remove(string id)
 
 	return n;
 }
+
 
 
 
@@ -249,9 +250,12 @@ void ETMMCL_Map::write(FileStorage& fs) const
 		<< "res"			<< res_
 		<< "origin_x"		<< x_
 		<< "origin_y"		<< y_
-		<< "primary"		<< pri_
-		<< "secondary"		<< sec_
-		<< "tertiary"		<< ter_
+//		<< "primary"		<< pri_
+//		<< "secondary"		<< sec_
+//		<< "tertiary"		<< ter_
+		<< pri_.name		<< pri_
+		<< sec_.name		<< sec_
+		<< ter_.name		<< ter_
 		<< "}";
 }
 
@@ -275,17 +279,17 @@ int ETMMCL_Map::update(string str, ETMMCL_TagList tacky)
 {
 	if (str.compare("primary"))
 	{
-		pri_ = tacky;
+		pri_ = tacky;//.clone();
 		return pri_.num;
 	}
 	else if (str.compare("secondary"))
 	{
-		sec_ = tacky;
+		sec_ = tacky;//.clone();
 		return sec_.num;
 	}
 	else if (str.compare("tertiary"))
 	{
-		ter_ = tacky;
+		ter_ = tacky;//.clone();
 		return ter_.num;
 	}
 	else
@@ -300,30 +304,30 @@ int ETMMCL_Map::purge(string str, string tacky)
 	ETMMCL_TagList *lister;
 	if (str.compare("primary"))
 	{
-		lister = pri_;
+		lister = &pri_;
 	}
 	else if (str.compare("secondary"))
 	{
-		lister = sec_;
+		lister = &sec_;
 	}
 	else if (str.compare("tertiary"))
 	{
-		lister = ter_;
+		lister = &ter_;
 	}
 	else
 	{
 		return n;
 	}
 
-	Vector<ETMMCL_Tag>::iterator head = lister->tags.begin();
-	Vector<ETMMCL_Tag>::iterator tail = lister->tags.end();
+	vector<ETMMCL_Tag>::iterator head = lister->tags.begin();
+	vector<ETMMCL_Tag>::iterator tail = lister->tags.end();
 
 	while (head != tail)
 	{
 		if (head->tag == tacky)
 		{
 			lister->tags.erase(head);
-			num--;
+			lister->num--;
 			n++;
 		}
 		else
@@ -340,36 +344,36 @@ int ETMMCL_Map::remove(string str, string uuid)
 	ETMMCL_TagList *lister;
 	if (str.compare("primary"))
 	{
-		lister = pri_;
+		lister = &pri_;
 	}
 	else if (str.compare("secondary"))
 	{
-		lister = sec_;
+		lister = &sec_;
 	}
 	else if (str.compare("tertiary"))
 	{
-		lister = ter_;
+		lister = &ter_;
 	}
 	else
 	{
 		return 0;
 	}
 
-	Vector<ETMMCL_Tag>::iterator head = lister->tags.begin();
-	Vector<ETMMCL_Tag>::iterator tail = lister->tags.end();
+	vector<ETMMCL_Tag>::iterator head = lister->tags.begin();
+	vector<ETMMCL_Tag>::iterator tail = lister->tags.end();
 
 	while (head != tail)
 	{
 		if (head->uuid == uuid)
 		{
 			lister->tags.erase(head);
-			num--;
+			lister->num--;
 		}
 		else
 			head++;
 	}
 
-	return num;
+	return lister->num;
 }
 
 
@@ -381,9 +385,11 @@ int ETMMCL_Map::remove(string str, string uuid)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int ETMMCL_Interface::pull_floorplan(string str)
 {
-	FileStorage fs(str, FileStorage::READ);
+//	FileStorage fs(str, FileStorage::READ);
 
-	fs[str] >> cmap_;
+//	fs[str] >> cmap_;
+
+	return 0;
 }
 
 
@@ -391,5 +397,6 @@ int ETMMCL_Interface::pull_floorplan(string str)
 int ETMMCL_Interface::push_floorplan(void)
 {
 
+	return 0;
 }
 
