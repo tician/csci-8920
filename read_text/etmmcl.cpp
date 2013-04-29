@@ -3,83 +3,180 @@
 void ETMMCL_Tag::write(FileStorage& fs) const
 {
 	fs	<< "{"
-		<< "Timestamp"		<< head->time
-		<< "TagText"		<< head->name
-		<< "Position_X"		<< head->x
-		<< "Position_Y"		<< head->y
-		<< "Weight"			<< head->w
+		<< "UUID"			<< uuid
+		<< "Timestamp"		<< time
+		<< "TagText"		<< tag
+		<< "Position_X"		<< x
+		<< "Position_Y"		<< y
+		<< "Weight"			<< w
 		<< "}";
 }
 
-tag_t ETMMCL_Tag::read(const FileNode& node)
+ETMMCL_Tag ETMMCL_Tag::read(const FileNode& node)
 {
-	uint64_t iter, n;
-	node["NumberTags"] >> n;
-	for (iter=0; iter<n; iter++)
-	{
-		node["Timestamp"] >>
-	}
+	node["UUID"]		>> uuid;
+	node["Timestamp"]	>> time;
+	node["TagText"]		>> tag;
+	node["Position_X"]	>> x;
+	node["Position_Y"]	>> y;
+	node["Weight"]		>> w;
 }
 
 */
 
-uint64_t ETMMCL_TagList::ETMMCL_TagList(string floorname)
-{
-	uint64_t iter, n;
-}
-tag_t ETMMCL_TagList::get(string str)
-{
-	Vector<tag_t>::iterator head = t.begin();
-	Vector<tag_t>::iterator tail = t.end();
-	while (head != tail)
-	{
-		if (head->tag == str)
-			return *head;
-		else
-			head++;
-	}
 
-	tag_t bleh;
-	bleh.time = 0;
-	bleh.tag = "NULL";
+ETMMCL_TagList::ETMMCL_TagList(string str)
+: name(str)
+, num(0)
+, tags()
+{
+	// pass desired tag list name (primary, secondary, tertiary)
+//	uint64_t iter, n=0;
 
-	return bleh;
 }
+
+ETMMCL_TagList::ETMMCL_TagList(void)
+: name()
+, num(0)
+, tags()
+{
+}
+
 
 void ETMMCL_TagList::write(FileStorage& fs) const
 {
-	Vector<tag_t>::iterator head = t_.begin();
-	Vector<tag_t>::iterator tail = t_.end();
+	Vector<ETMMCL_Tag>::iterator head = tags.begin();
+	Vector<ETMMCL_Tag>::iterator tail = tags.end();
+	assert( (tail-head) == num );
+	assert(num == tags.size());
 	fs << "{" << "NumberTags" << (tail-head);
 	for (; head!=tail; head++)
 	{
-		fs	<< "{"
-				<< "Timestamp"		<< head->time
-				<< "TagText"		<< head->name
-				<< "Position_X"		<< head->x
-				<< "Position_Y"		<< head->y
-				<< "Weight"			<< head->w
-			<< "}";
+		(*head).write(fs);
 	}
 	fs << "}";
 }
 
-tag_t ETMMCL_TagList::read(const FileNode& node)
+void ETMMCL_TagList::read(const FileNode& node)
 {
-	uint64_t iter, n;
+	int iter, n;
 	node["NumberTags"] >> n;
 	for (iter=0; iter<n; iter++)
 	{
-		node["Timestamp"] >>
+		ETMMCL_Tag temp;
+		temp.read(node);
+		tags.push_back(temp);
+		num++;
 	}
+	assert(num == n);
+	assert(num == tags.size());
+}
+
+Vector<ETMMCL_Tag> ETMMCL_TagList::get(string str)
+{
+	Vector<ETMMCL_Tag> matches;
+	Vector<ETMMCL_Tag>::iterator head = tags.begin();
+	Vector<ETMMCL_Tag>::iterator tail = tags.end();
+	while (head != tail)
+	{
+		if (head->tag == str)
+			matches.push_back(*head);
+		else
+			head++;
+	}
+
+	return matches;
+}
+
+int ETMMCL_TagList::add(ETMMCL_Tag tacky)
+{
+	if (tacky.uuid.empty())
+		return 0;
+
+	tags.push_back(tacky);
+	num++;
+	assert(num == tags.size());
+	return num;
 }
 
 
 
+/*
 
 
+int ETMMCL_Map::purge(string str, string tacky)
+{
+	ETMMCL_TagList *lister;
+	if (str.compare("primary"))
+	{
+		lister = pri_;
+	}
+	else if (str.compare("secondary"))
+	{
+		lister = sec_;
+	}
+	else if (str.compare("tertiary"))
+	{
+		lister = ter_;
+	}
+	else
+	{
+		return 0;
+	}
 
+	Vector<ETMMCL_Tag>::iterator head = lister->tags.begin();
+	Vector<ETMMCL_Tag>::iterator tail = lister->tags.end();
 
+	while (head != tail)
+	{
+		if (head->tag == tacky)
+		{
+			lister->tags.erase(head);
+			num--;
+		}
+		else
+			head++;
+	}
+
+	return num;
+}
+
+int ETMMCL_Map::remove(string str, string uuid)
+{
+	ETMMCL_TagList *lister;
+	if (str.compare("primary"))
+	{
+		lister = pri_;
+	}
+	else if (str.compare("secondary"))
+	{
+		lister = sec_;
+	}
+	else if (str.compare("tertiary"))
+	{
+		lister = ter_;
+	}
+	else
+	{
+		return 0;
+	}
+
+	Vector<ETMMCL_Tag>::iterator head = lister->tags.begin();
+	Vector<ETMMCL_Tag>::iterator tail = lister->tags.end();
+
+	while (head != tail)
+	{
+		if (head->uuid == uuid)
+		{
+			lister->tags.erase(head);
+			num--;
+		}
+		else
+			head++;
+	}
+
+	return num;
+}
 
 
 
@@ -95,3 +192,4 @@ int ETMMCL_Interface::push_floorplan(void)
 
 }
 
+*/
