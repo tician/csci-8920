@@ -45,11 +45,11 @@ ETMMCL_TagList::ETMMCL_TagList(void)
 
 void ETMMCL_TagList::write(FileStorage& fs) const
 {
-	Vector<ETMMCL_Tag>::iterator head = tags.begin();
-	Vector<ETMMCL_Tag>::iterator tail = tags.end();
+	Vector<ETMMCL_Tag>::iterator head = (Vector<ETMMCL_Tag>::iterator) tags.begin();
+	Vector<ETMMCL_Tag>::iterator tail = (Vector<ETMMCL_Tag>::iterator) tags.end();
 	assert( (tail-head) == num );
 	assert(num == tags.size());
-	fs << "{" << "NumberTags" << (tail-head);
+	fs << "{" << "NumberTags" << (int)(tail-head);
 	for (; head!=tail; head++)
 	{
 		(*head).write(fs);
@@ -71,6 +71,7 @@ void ETMMCL_TagList::read(const FileNode& node)
 	assert(num == n);
 	assert(num == tags.size());
 }
+
 
 Vector<ETMMCL_Tag> ETMMCL_TagList::get(string str)
 {

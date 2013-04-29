@@ -23,11 +23,9 @@ public:
 // Only (int, float, double and string) are permitted with filestorage (writeScalar() not yet implemented for others)
 
 	string				uuid;		// UUID of tag
-//	uint64_t			time;		// Timestamp (creation)
-	int			time;		// Timestamp (creation)
+	int					time;		// Timestamp (creation)
 	string				tag;		// Text tag
-//	int64_t			x,y;		// (X,Y) position
-	int			x,y;		// (X,Y) position
+	int					x,y;		// (X,Y) position
 	double				w;			// weight/confidence?
 
 public:
@@ -77,8 +75,7 @@ public:
 	ETMMCL_TagList(void);
 
 	string				name;		// Name of TagList
-//	uint64_t			num;		// Number of tags in list
-	int			num;		// Number of tags in list
+	int					num;		// Number of tags in list
 	Vector<ETMMCL_Tag>	tags;		// Vector of tags
 
 	void write(FileStorage&) const;
@@ -109,9 +106,9 @@ class ETMMCL_Map
 private:
 	string				name_;		// Floorplan name
 	Mat					map_;		// Map of floor
-	int			x_;			// Map origin X
-	int			y_;			// Map origin Y
-	int			res_;		// Map resolution (# of mm/pixel)
+	int					x_;			// Map origin X
+	int					y_;			// Map origin Y
+	int					res_;		// Map resolution (# of mm/pixel)
 
 	ETMMCL_TagList		pri_;		// Primary (immutable) TagList
 	ETMMCL_TagList		sec_;		// Secondary (human-set) TagList
