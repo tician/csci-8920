@@ -49,10 +49,10 @@ void ETMMCL_TagList::write(FileStorage& fs) const
 	Vector<ETMMCL_Tag>::iterator tail = (Vector<ETMMCL_Tag>::iterator) tags.end();
 	assert( (tail-head) == num );
 	assert(num == tags.size());
-	fs << "{" << "NumberTags" << (int)(tail-head);
+	fs << "{" << "NumberTags" << num;
 	for (; head!=tail; head++)
 	{
-		(*head).write(fs);
+		head->write(fs);
 	}
 	fs << "}";
 }

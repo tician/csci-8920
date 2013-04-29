@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 
 	ETMMCL_Tag tagster;
 
-	ETMMCL_TagList lister;
+	ETMMCL_TagList lister("primary");
 
 	for (int iter=0; iter<5; iter++)
 	{
