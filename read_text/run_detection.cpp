@@ -15,10 +15,11 @@ const char* WIN_DER = "Holy macaroni";
 int main(int argc, char* argv[])
 {
 	string filename = "./tempy.xml";
+
+	{
 	FileStorage fs(filename, FileStorage::WRITE);
 
 	ETMMCL_Tag tagster;
-
 	ETMMCL_TagList lister("primary");
 
 	for (int iter=0; iter<5; iter++)
@@ -32,9 +33,23 @@ int main(int argc, char* argv[])
 		lister.add(tagster);
 	}
 
-	fs << lister;
+	fs << lister.name << lister;
+	}
 
+	{
+	FileStorage fs(filename, FileStorage::READ);
 
+    if (!fs.isOpened())
+    {
+      cerr << "failed to open " << filename << endl;
+      return 1;
+    }
+
+	ETMMCL_TagList custer;
+	fs["primary"] >> custer;
+
+	cout << "length: " << custer.num << endl;
+	}
 
 	return 0;
 

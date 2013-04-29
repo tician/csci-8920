@@ -5,9 +5,15 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
+#include <iostream>
+#include <sstream>
+
 using namespace cv;
 using namespace std;
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class ETMMCL_Tag
 {
 public:
@@ -29,35 +35,18 @@ public:
 	double				w;			// weight/confidence?
 
 public:
-	void write(FileStorage& fs) const
-	{
-		fs	<< "{"
-			<< "UUID"			<< uuid
-			<< "Timestamp"		<< time
-			<< "TagText"		<< tag
-			<< "Position_X"		<< x
-			<< "Position_Y"		<< y
-			<< "Weight"			<< w
-			<< "}";
-	}
+	void write(FileStorage& fs) const;
 
-	void read(const FileNode& node)
-	{
-		node["UUID"]		>> uuid;
-		node["Timestamp"]	>> time;
-		node["TagText"]		>> tag;
-		node["Position_X"]	>> x;
-		node["Position_Y"]	>> y;
-		node["Weight"]		>> w;
-	}
+	void read(const FileNode& node);
 
 };
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 static void write(FileStorage& fs, const std::string&, const ETMMCL_Tag& x)
 {
     x.write(fs);
 }
-
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 static void read(const FileNode& node, ETMMCL_Tag& x, const ETMMCL_Tag& default_value = ETMMCL_Tag())
 {
     if(node.empty())
@@ -67,6 +56,9 @@ static void read(const FileNode& node, ETMMCL_Tag& x, const ETMMCL_Tag& default_
 }
 
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class ETMMCL_TagList
 {
 public:
@@ -85,11 +77,12 @@ public:
 	int add(ETMMCL_Tag);
 };
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 static void write(FileStorage& fs, const std::string&, const ETMMCL_TagList& x)
 {
     x.write(fs);
 }
-
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 static void read(const FileNode& node, ETMMCL_TagList& x, const ETMMCL_TagList& default_value = ETMMCL_TagList())
 {
     if(node.empty())
@@ -99,8 +92,11 @@ static void read(const FileNode& node, ETMMCL_TagList& x, const ETMMCL_TagList& 
 }
 
 
-/*
 
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class ETMMCL_Map
 {
 private:
@@ -119,16 +115,53 @@ public:
 	int purge(string, string);
 	int remove(string, string);
 
+	void write(FileStorage&) const;
+	void read(const FileNode&);
 };
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+static void write(FileStorage& fs, const std::string&, const ETMMCL_Map& x)
+{
+    x.write(fs);
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+static void read(const FileNode& node, ETMMCL_Map& x, const ETMMCL_Map& default_value = ETMMCL_Map())
+{
+    if(node.empty())
+        x = default_value;
+    else
+        x.read(node);
+}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class ETMMCL_Interface
 {
 private:
 	int pull_floorplan(string);
 	int push_floorplan(void);
 
-	ETMMCL_Map map_;
+	ETMMCL_Map cmap_;
 
 public:
 	int load(string str)	{return pull_floorplan(str);}
@@ -139,7 +172,6 @@ public:
 };
 
 
-*/
 
 
 #endif
