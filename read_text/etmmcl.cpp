@@ -421,7 +421,9 @@ int ETMMCL_Map::remove(string str, string id)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int ETMMCL_Interface::pull_floorplan(string str)
 {
-	FileStorage fs(str, FileStorage::READ);
+	string filename = "./maps/" + str + ".xml";
+
+	FileStorage fs(filename, FileStorage::READ);
 
 	fs["ETMMCL_Map"] >> map_;
 
@@ -432,7 +434,7 @@ int ETMMCL_Interface::pull_floorplan(string str)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int ETMMCL_Interface::push_floorplan(void)
 {
-	string filename = "./maps/" + map.check() + ".xml";
+	string filename = "./maps/" + map_.id() + ".xml";
 
 	FileStorage fs(filename, FileStorage::WRITE);
 

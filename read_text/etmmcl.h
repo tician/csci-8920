@@ -87,11 +87,12 @@
 #define ETMMCL_INTERFACE_H
 
 #include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
+//#include "opencv2/highgui/highgui.hpp"
+//#include "opencv2/imgproc/imgproc.hpp"
 
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 using namespace cv;
 using namespace std;
@@ -225,7 +226,7 @@ public:
 	void write(FileStorage&) const;
 	void read(const FileNode&);
 
-	string check(void) {return name_;}
+	string id(void) {return name_;}
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -273,9 +274,9 @@ private:
 	ETMMCL_Map map_;
 
 public:
-	int load(string str)	{return pull_floorplan(str);}
-	int update(void)		{return push_floorplan();}
-	string check(void)		{return map_.check();}
+	int pull(string str)	{return pull_floorplan(str);}
+	int push(void)			{return push_floorplan();}
+	string id(void)		{return map_.id();}
 
 	vector<ETMMCL_Pose> sample(vector<ETMMCL_EnvText>&);
 };
@@ -289,8 +290,11 @@ public:
 
 class ETMMCL
 {
-public:
+private:
 
+
+public:
+	void spin(void);
 
 
 };
