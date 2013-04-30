@@ -286,14 +286,44 @@ public:
 
 
 
-
+/**
+ MMCL:
+  phi~0.1
+  m is variable depending on available cycles and confidence in pose and text
+  <X,W> = initial estimates of pose and weight <x_i,w_i>
+  while(1)
+    for iter=1:1:m
+      if urand(0,1)<(1-phi)
+        generate random last pose x from X based on pose weight w (roulette or tournament?)
+        generate random current pose x' from P(x'|x,a)
+        estimate weight w' of pose x' from P(o|x')
+        add <x',w'> to X'
+      else
+        generate random current pose x' from P(x'|o) (weighted: pri > sec >> ter)
+        generate random last pose x from P(x'|x,a)
+        estimate weight w' of pose x' from tag confidence and ~weight w of x
+        add <x',w'> to <X',W'>
+      end
+    end
+    normalize W'
+    <X,W> = <X',W'>
+  end
+*/
 
 class ETMMCL
 {
 private:
+	vector<ETMMCL_Pose>		pz_;			// Particles
+	int 					pmin_, pmax_;	// Min/Max number particles
+	double					phi_;			// Mixture rate
 
+	ETMMCL_Interface		mapper
 
 public:
+	ETMMCL(void);
+	void init(string);
+	void init(ETMMCL_Pose);
+
 	void spin(void);
 
 
