@@ -250,12 +250,12 @@ void ETMMCL_Map::write(FileStorage& fs) const
 		<< "res"			<< res_
 		<< "origin_x"		<< x_
 		<< "origin_y"		<< y_
-//		<< "primary"		<< pri_
-//		<< "secondary"		<< sec_
-//		<< "tertiary"		<< ter_
-		<< pri_.name		<< pri_
-		<< sec_.name		<< sec_
-		<< ter_.name		<< ter_
+		<< "primary"		<< pri_
+		<< "secondary"		<< sec_
+		<< "tertiary"		<< ter_
+//		<< pri_.name		<< pri_
+//		<< sec_.name		<< sec_
+//		<< ter_.name		<< ter_
 		<< "}";
 }
 
@@ -277,19 +277,22 @@ void ETMMCL_Map::read(const FileNode& node)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int ETMMCL_Map::update(string str, ETMMCL_TagList tacky)
 {
-	if (str.compare("primary"))
+	if (str.compare("primary")==0)
 	{
 		pri_ = tacky;//.clone();
+//		cout << "primary set: " << pri_.num << endl;
 		return pri_.num;
 	}
-	else if (str.compare("secondary"))
+	else if (str.compare("secondary")==0)
 	{
 		sec_ = tacky;//.clone();
+//		cout << "secondary set: " << sec_.num << endl;
 		return sec_.num;
 	}
-	else if (str.compare("tertiary"))
+	else if (str.compare("tertiary")==0)
 	{
 		ter_ = tacky;//.clone();
+//		cout << "tertiary set: " << ter_.num << endl;
 		return ter_.num;
 	}
 	else

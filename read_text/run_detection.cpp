@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 
 
 
-	fs << mapper.check() << mapper;
+	fs << "ETMMCL_Map" << mapper;
 
 
 
