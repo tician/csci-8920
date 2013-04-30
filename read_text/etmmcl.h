@@ -105,7 +105,7 @@ typedef struct
 	int			x,y;	// map coordinate/index (x,y)
 	double		t;		// bot orientation (theta)
 	double		w;		// weight of estimated pose
-} ETMMCL_Pose;
+} ETMMCL_Sample;
 
 typedef struct
 {
@@ -211,7 +211,7 @@ private:
 	Mat					map_;		// Map of floor
 	int					x_;			// Map origin X
 	int					y_;			// Map origin Y
-	double				res_;		// Map resolution (# of mm/pixel)
+	double				res_;		// Map resolution (m/pixel)
 
 	ETMMCL_TagList		pri_;		// Primary (immutable) TagList
 	ETMMCL_TagList		sec_;		// Secondary (human-set) TagList
@@ -278,7 +278,7 @@ public:
 	int push(void)			{return push_floorplan();}
 	string id(void)		{return map_.id();}
 
-	vector<ETMMCL_Pose> sample(vector<ETMMCL_EnvText>&);
+	vector<ETMMCL_Sample> sample(vector<ETMMCL_EnvText>&);
 };
 
 
@@ -295,12 +295,13 @@ public:
     for iter=1:1:m
       if urand(0,1)<(1-phi)
         generate random last pose x from X based on pose weight w (roulette or tournament?)
-        generate random current pose x' from P(x'|x,a)
-        estimate weight w' of pose x' from P(o|x')
-        add <x',w'> to X'
+        generate random current pose x' from P(x'|x,a) = P(pose_now|pose_last,movement)
+        estimate weight w' of pose x' from P(o|x') = P(text/wall_distance,obs_text|pose_now)
+        add <x',w'> to <X',W'>
       else
-        generate random current pose x' from P(x'|o) (weighted: pri > sec >> ter)
-        generate random last pose x from P(x'|x,a)
+        generate random current pose x' from P(x'|o) = P(pose_now|text/wall_distance,obs_text)
+            (weighted: pri > sec >> ter)
+        generate random last pose x from P(x'|x,a) = P(pose_now|pose_last,movement)
         estimate weight w' of pose x' from tag confidence and ~weight w of x
         add <x',w'> to <X',W'>
       end
@@ -310,10 +311,23 @@ public:
   end
 */
 
+
+class FMMCL
+{
+
+
+};
+
+class DMMCL
+{
+
+
+};
+
 class ETMMCL
 {
 private:
-	vector<ETMMCL_Pose>		pz_;			// Particles
+	vector<ETMMCL_Sample>	pz_;			// Particles
 	int 					pmin_, pmax_;	// Min/Max number particles
 	double					phi_;			// Mixture rate
 
@@ -322,12 +336,11 @@ private:
 public:
 	ETMMCL(void);
 	void init(string);
-	void init(ETMMCL_Pose);
+	void init(ETMMCL_Sample);
 
 	void spin(void);
 
 
 };
-
 
 #endif

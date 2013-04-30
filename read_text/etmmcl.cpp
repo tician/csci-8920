@@ -83,7 +83,7 @@ void ETMMCL_Tag::read(const FileNode& node)
 	node["TagText"]			>> tag;
 	node["Position_X"]		>> x;
 	node["Position_Y"]		>> y;
-	node["FontSize"]			>> font;
+	node["FontSize"]		>> font;
 	node["Weight"]			>> w;
 }
 
@@ -249,7 +249,7 @@ int ETMMCL_TagList::remove(string id)
 ETMMCL_Map::ETMMCL_Map(string str)
 : name_(str)
 , map_()
-, res_(1000)
+, res_(0.01)
 , x_(0)
 , y_(0)
 , pri_()
@@ -264,7 +264,7 @@ ETMMCL_Map::ETMMCL_Map(string str)
 ETMMCL_Map::ETMMCL_Map(void)
 : name_()
 , map_()
-, res_(1000)
+, res_(0.01)
 , x_(0)
 , y_(0)
 , pri_()
@@ -467,7 +467,7 @@ void ETMMCL::init(string str)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void ETMMCL::init(ETMMCL_Pose pos)
+void ETMMCL::init(ETMMCL_Sample pos)
 {
 
 }
