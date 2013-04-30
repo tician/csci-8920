@@ -27,26 +27,59 @@
  *******************************************************************************
  */
 
+/**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Basically...
+  -Every tag consists of: a location, a string, a uuid, a timestamp,
+    an approximate font size (mm tall), and a confidence (how common
+	 is this string of text and how likely is it that it has actually
+	 been encountered).
+  -Every taglist constists of multiple tags and a length counter.
+  -Every map consists of three taglists (primary, secondary, and tertiary),
+    as well as a map image, map resolution, map origin, and map name.
+     Primary   - Immutable        - Room numbers
+     Secondary - Human changeable - Uncommon text tags
+     Tertiary  - Auto-added       - Misc. text tags
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Basically...
-// -Every tag consists of: a location, a string, a uuid, a timestamp,
-//   and a weight or confidence (how common is this string of text and how
-//   likely is it that it has actually been encountered).
-// -Every taglist constists of multiple tags and a length counter.
-// -Every map consists of three taglists (primary, secondary, and tertiary),
-//   as well as a map image, map resolution, map origin, and map name.
-//    Primary   - Immutable        - Room numbers
-//    Secondary - Human changeable - Uncommon text tags
-//    Tertiary  - Auto-added       - Misc. text tags
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+ Environmental Text Extraction via Stroke Width Transform
+  Canny-edge -> sobel(x,y) -> gradient at edges -> stroke width of blob
+   if mostly constant stroke width, then likely text -> send to tesseract
+  recovered text -> primary tag list   -> high confidence   P(x'|o)
+  recovered text -> secondary tag list -> medium confidence P(x'|o)
+  recovered text -> tertiary tag list  -> low confidence    P(x'|o)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ MMCL:
+  phi~0.1
+  m is variable depending on available cycles and confidence in pose and text
+  <X,W> = initial estimates of pose and weight <x_i,w_i>
+  while(1)
+    for iter=1:1:m
+      if urand(0,1)<(1-phi)
+        generate random last pose x from X based on pose weight w (roulette or tournament?)
+        generate random current pose x' from P(x'|x,a)
+        estimate weight w' of pose x' from P(o|x')
+        add <x',w'> to X'
+      else
+        generate random current pose x' from P(x'|o) (weighted: pri > sec >> ter)
+        generate random last pose x from P(x'|x,a)
+        estimate weight w' of pose x' from tag confidence and ~weight w of x
+        add <x',w'> to <X',W'>
+      end
+    end
+    normalize W'
+    <X,W> = <X',W'>
+  end
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
 
 #ifndef ETMMCL_INTERFACE_H
 #define ETMMCL_INTERFACE_H
@@ -64,6 +97,25 @@ using namespace std;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+typedef struct
+{
+	int			x,y;	// map coordinate/index (x,y)
+	double		t;		// bot orientation (theta)
+	double		w;		// weight of estimated pose
+} ETMMCL_Pose;
+
+typedef struct
+{
+	string		s;		// retrieved text string
+	double		f;		// approximate font size (mm tall)
+	double		d;		// approximate distance (mm)
+	double		t;		// orientation (theta) of text relative to camera or base_link?
+} ETMMCL_EnvText;
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class ETMMCL_Tag
 {
 public:
@@ -76,6 +128,7 @@ public:
 	int					time;		// Timestamp (creation)
 	string				tag;		// Text tag
 	int					x,y;		// (X,Y) position
+	double				font;		// Approximate font height
 	double				w;			// weight/confidence?
 
 public:
@@ -155,7 +208,7 @@ private:
 	Mat					map_;		// Map of floor
 	int					x_;			// Map origin X
 	int					y_;			// Map origin Y
-	int					res_;		// Map resolution (# of mm/pixel)
+	double				res_;		// Map resolution (# of mm/pixel)
 
 	ETMMCL_TagList		pri_;		// Primary (immutable) TagList
 	ETMMCL_TagList		sec_;		// Secondary (human-set) TagList
@@ -215,14 +268,14 @@ private:
 	int pull_floorplan(string);
 	int push_floorplan(void);
 
-	ETMMCL_Map cmap_;
+	ETMMCL_Map map_;
 
 public:
 	int load(string str)	{return pull_floorplan(str);}
 	int update(void)		{return push_floorplan();}
-	string check(void)		{return cmap_.check();}
+	string check(void)		{return map_.check();}
 
-
+	vector<ETMMCL_Pose> sample(vector<ETMMCL_EnvText>&);
 };
 
 
@@ -230,6 +283,15 @@ public:
 
 
 
+
+
+class ETMMCL
+{
+public:
+
+
+
+};
 
 
 #endif
