@@ -1,4 +1,6 @@
 /*******************************************************************************
+ * Environmental Text Mixture Monte Carlo Localization
+ *******************************************************************************
  * Copyright (c) 2013, Matthew Paulishen.
  * All rights reserved.
  *
