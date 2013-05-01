@@ -290,8 +290,21 @@ public:
  MMCL:
   phi~0.1
   m is variable depending on available cycles and confidence in pose and text
-  <X,W> = initial estimates of pose and weight <x_i,w_i>
-  while(1)
+
+  init()
+    sample_set = uniform_dist[x,y] with all w=(1/pmax_) and timestamp=now();
+    time_odom_last_ = odom.timestamp || 1979;
+    time_text_last_ = text.timestamp || 1979;
+    time_sampled_last_ = sample_set.timestamp;
+
+
+  process(void)
+    if (odom_.timestamp > time_odom_last_)
+      new_sample_set = FMCL(sample_set, odom);
+
+    end
+
+
     for iter=1:1:m
       if urand(0,1)<(1-phi)
         generate random last pose x from X based on pose weight w (roulette or tournament?)
@@ -315,7 +328,7 @@ public:
 extern "C" {
 #include <gsl/gsl_randist.h>
 }
-vector<ETMMCL_Sample> resample(vector<ETMMCL_Sample> current_set)
+vector<ETMMCL_Sample> FMCL::resample(vector<ETMMCL_Sample> current_set)
 {
 	size_t num_particles = current_set.size();
 	size_t iter;
@@ -340,14 +353,14 @@ vector<ETMMCL_Sample> resample(vector<ETMMCL_Sample> current_set)
 	gsl_rng_set (rng, seed);
 	rng_dd = gsl_ran_discrete_preproc(num_particles, W);
 
-//	do
-//	{
-		for (iter=0; iter<num_particles; iter++)
+	do
+	{
+		for (iter=0; iter<pmin_; iter++)
 		{
 			size_t indi = gsl_ran_discrete(rng, rng_dd);
 			next_set.push_back( current_set[indi] );
 		}
-//	} while (!samples_sufficient);
+	} while ( (!samples_sufficient) && (next_set.size()<pmax_) );
 
 
 	gsl_ran_discrete_free(rng_dd);
@@ -357,13 +370,13 @@ vector<ETMMCL_Sample> resample(vector<ETMMCL_Sample> current_set)
 	return next_set;
 }
 
-class FMMCL
+class FMCL
 {
 
 
 };
 
-class DMMCL
+class DMCL
 {
 
 
@@ -376,7 +389,7 @@ private:
 	int 					pmin_, pmax_;	// Min/Max number particles
 	double					phi_;			// Mixture rate
 
-	ETMMCL_Interface		mapper
+	ETMMCL_Interface		mapper;
 
 public:
 	ETMMCL(void);
