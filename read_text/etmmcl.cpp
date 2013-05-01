@@ -97,6 +97,7 @@ TagList::TagList(string str)
 : name(str)
 , num(0)
 , tags()
+, weight(0.5)
 {
 	// pass desired tag list name (primary, secondary, tertiary)
 }
@@ -107,6 +108,7 @@ TagList::TagList(void)
 : name()
 , num(0)
 , tags()
+, weight(0.5)
 {
 }
 
@@ -119,6 +121,7 @@ void TagList::write(FileStorage& fs) const
 	assert( len == num );
 	fs	<< "{";
 	fs	<< "length" << num;
+	fs	<< "weight" << weight;
 
 	stringstream stst (stringstream::in | stringstream::out);
 	for (iter=0; iter<len; iter++)
@@ -135,6 +138,7 @@ void TagList::write(FileStorage& fs) const
 void TagList::read(const FileNode& node)
 {
 	int iter, n;
+	node["weight"] >> weight;
 	node["length"] >> n;
 	std::cout << n << endl;
 	stringstream stst (stringstream::in | stringstream::out);
@@ -439,7 +443,7 @@ int Interface::push_floorplan(void)
 
 	FileStorage fs(filename, FileStorage::WRITE);
 
-	fs << "ETMMCL_Map" << mapper;
+	fs << "ETMMCL_Map" << map_;
 
 	return 0;
 }
@@ -453,7 +457,6 @@ int Interface::push_floorplan(void)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ETMMCL::ETMMCL(void)
 : pz_()
-, ppz_()
 , pmin_(500)
 , pmax_(5000)
 , phi_(0.1)
@@ -529,15 +532,17 @@ void ETMMCL::resample(void)
 
 	// Create a temp sample set
 	vector<Particle> potent;
+	double sigma_w = 0.0;
 
 	do
 	{
+		Particle prime;
 		/// Forward MCL (sample last set to get new particle)
 		if (gsl_ran_flat(rng,0,1) < (1-phi_))
 		{
 			size_t indi = gsl_ran_discrete(rng, rng_dd);
 
-			Particle prime = pz_[indi];
+			prime = pz_[indi];
 
 			fmcl(prime);
 			potent.push_back(prime);
@@ -545,11 +550,12 @@ void ETMMCL::resample(void)
 		/// Dual MCL (generate new particle from observation)
 		else
 		{
-			Particle prime = dmcl();
+			prime = dmcl();
 			potent.push_back(prime);
 		}
+		sigma_w += prime.w;
 
-	} while ( (!samples_sufficient) && (potent.size()>pmin_) && (potent.size()<pmax_) );
+	} while ( (sigma_w<1000) && (potent.size()>pmin_) && (potent.size()<pmax_) );
 
 
 
@@ -558,7 +564,9 @@ void ETMMCL::resample(void)
 	gsl_rng_free (rng);
 
 
-
+    time_odom_last_ = odom_.timestamp;
+    time_dist_last_ = text_.timestamp;
+    time_sampled_last_ = time(NULL);
 
 }
 
@@ -594,7 +602,7 @@ void ETMMCL::fmcl(Particle& sampl)
 		double d = mapper_.raytrace(sampl);
 
 		// Invalid sensor data and/or out of range
-		if (dist_.D > 1.8)
+		if (dist_.scans[0].D > 1.8)
 		{
 			if (d > 1.8)
 			{
@@ -610,7 +618,7 @@ void ETMMCL::fmcl(Particle& sampl)
 		else
 		{
 			// Calculate new weight (arbitrary calculation)
-			double wp = (0.8) / abs(dist_.D - d);
+			double wp = (0.8) / abs(dist_.scans[0].D - d);
 			if (wp > 2.0)
 			{
 				wp = 2.0;
@@ -629,8 +637,11 @@ void ETMMCL::fmcl(Particle& sampl)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Particle ETMMCL::dmcl(void)
 {
-	if (text_.is_empty())
+	Particle sampl;
+
+	if (text_.size() > 0)
 	{
+
 	}
 	else
 	{
@@ -645,7 +656,7 @@ Particle ETMMCL::dmcl(void)
 		double d = mapper_.raytrace(sampl);
 
 		// Invalid sensor data and/or out of range
-		if (dist_.D > 1.8)
+		if (dist_.scans[0].D > 1.8)
 		{
 			if (d > 1.8)
 			{
@@ -661,7 +672,7 @@ Particle ETMMCL::dmcl(void)
 		else
 		{
 			// Calculate new weight (arbitrary calculation)
-			double wp = (0.8) / abs(dist_.D - d);
+			double wp = (0.8) / abs(dist_.scans[0].D - d);
 			if (wp > 2.0)
 			{
 				wp = 2.0;

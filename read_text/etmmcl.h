@@ -102,12 +102,14 @@ namespace etmmcl
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-typedef struct
+typedef struct Particle
 {
+	Particle(void) : x(0),  y(0), t(0), w(0) {};
+
 	int					x,y;	// map coordinate/index (x,y)
 	double				t;		// bot orientation (theta)
 	double				w;		// weight of estimated pose
-} Particle;
+};
 
 typedef struct
 {
@@ -115,17 +117,17 @@ typedef struct
 	double				f;		// approximate font size (mm tall)
 	double				d;		// approximate distance (mm)
 	double				t;		// orientation (theta) of text relative to camera or base_link?
+	int					timestamp;
 } EnvText;
 
 typedef struct
 {
-	struct
-	{
-		double			D;
-		double			T;
-	} Pole;
-
-	vector<Pole> 		scans;
+	double				D;
+	double				T;
+} PolCoor;
+typedef struct
+{
+	vector<PolCoor>		scans;
 	int					timestamp;
 } DistanceScan;
 
@@ -183,6 +185,7 @@ public:
 	string				name;		// Name of TagList
 	int					num;		// Number of tags in list
 	vector<Tag>			tags;		// Vector of tags
+	double				weight;		// Weight of all tags in list
 
 	void write(FileStorage&) const;
 	void read(const FileNode&);
@@ -293,6 +296,7 @@ public:
 	string id(void)		{return map_.id();}
 
 	vector<Particle> sample(vector<EnvText>&);
+	double raytrace(Particle) {return 0.0;}
 };
 
 
@@ -378,7 +382,16 @@ private:
 
 	Interface	mapper_;
 
-	vector<Particle>	text_;			// Set of Particles from text tags (empty if none)
+	struct Odometry
+	{
+		Odometry(void) : dx(0.0), dy(0.0), dt(0.0), timestamp(0) {};
+		double			dx, dy, dt;
+		int				timestamp;
+	};
+
+	vector<Odometry>	history_;
+	Odometry			odom_;
+	vector<EnvText>		text_;			// Set of Particles from text tags (empty if none)
 	DistanceScan		dist_;			// Set of distance scans at time
 
 	int					time_odom_last_;
@@ -388,6 +401,11 @@ private:
 	void resample(void);
 	void fmcl(Particle&);
 	Particle dmcl(void);
+
+
+	void updateOdom() {return;}
+	void updateText() {return;}
+	void updateDist() {return;}
 
 public:
 	ETMMCL(void);
