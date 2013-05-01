@@ -32,36 +32,38 @@
 
 #include "etmmcl.h"
 
+namespace etmmcl
+{
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ETMMCL_Tag::ETMMCL_Tag(string id, string str)
+Tag::Tag(string id, string str)
 : uuid(id)
 , time(0)
 , tag(str)
 , x(0)
 , y(0)
 , font(25.4)
-, w(0.0)
+//, w(0.0)
 {}
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ETMMCL_Tag::ETMMCL_Tag(void)
+Tag::Tag(void)
 : uuid()
 , time(0)
 , tag()
 , x(0)
 , y(0)
 , font(25.4)
-, w(0.0)
+//, w(0.0)
 {}
 
 
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void ETMMCL_Tag::write(FileStorage& fs) const
+void Tag::write(FileStorage& fs) const
 {
 	fs	<< "{"
 		<< "UUID"			<< uuid
@@ -70,13 +72,13 @@ void ETMMCL_Tag::write(FileStorage& fs) const
 		<< "Position_X"		<< x
 		<< "Position_Y"		<< y
 		<< "FontSize"		<< font
-		<< "Weight"			<< w
+//		<< "Weight"			<< w
 		<< "}";
 }
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void ETMMCL_Tag::read(const FileNode& node)
+void Tag::read(const FileNode& node)
 {
 	node["UUID"]			>> uuid;
 	node["Timestamp"]		>> time;
@@ -84,14 +86,14 @@ void ETMMCL_Tag::read(const FileNode& node)
 	node["Position_X"]		>> x;
 	node["Position_Y"]		>> y;
 	node["FontSize"]		>> font;
-	node["Weight"]			>> w;
+//	node["Weight"]			>> w;
 }
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ETMMCL_TagList::ETMMCL_TagList(string str)
+TagList::TagList(string str)
 : name(str)
 , num(0)
 , tags()
@@ -101,7 +103,7 @@ ETMMCL_TagList::ETMMCL_TagList(string str)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ETMMCL_TagList::ETMMCL_TagList(void)
+TagList::TagList(void)
 : name()
 , num(0)
 , tags()
@@ -110,7 +112,7 @@ ETMMCL_TagList::ETMMCL_TagList(void)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void ETMMCL_TagList::write(FileStorage& fs) const
+void TagList::write(FileStorage& fs) const
 {
 	int len, iter;
 	len = tags.size();
@@ -130,7 +132,7 @@ void ETMMCL_TagList::write(FileStorage& fs) const
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void ETMMCL_TagList::read(const FileNode& node)
+void TagList::read(const FileNode& node)
 {
 	int iter, n;
 	node["length"] >> n;
@@ -141,7 +143,7 @@ void ETMMCL_TagList::read(const FileNode& node)
 	{
 		stst.clear();stst.str("");
 		stst << "tag_" << iter;
-		ETMMCL_Tag temp;
+		Tag temp;
 		node[stst.str()] >> temp;
 //		std::cout << temp.uuid << endl;
 		tags.push_back(temp);
@@ -153,11 +155,11 @@ void ETMMCL_TagList::read(const FileNode& node)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-vector<ETMMCL_Tag> ETMMCL_TagList::get(string str)
+vector<Tag> TagList::get(string str)
 {
-	vector<ETMMCL_Tag> matches;
-	vector<ETMMCL_Tag>::iterator head = tags.begin();
-	vector<ETMMCL_Tag>::iterator tail = tags.end();
+	vector<Tag> matches;
+	vector<Tag>::iterator head = tags.begin();
+	vector<Tag>::iterator tail = tags.end();
 	while (head != tail)
 	{
 		if (head->tag.compare(str)==0)
@@ -171,7 +173,7 @@ vector<ETMMCL_Tag> ETMMCL_TagList::get(string str)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int ETMMCL_TagList::add(ETMMCL_Tag tacky)
+int TagList::add(Tag tacky)
 {
 	if (tacky.uuid.empty())
 		return 0;
@@ -184,7 +186,7 @@ int ETMMCL_TagList::add(ETMMCL_Tag tacky)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int ETMMCL_TagList::purge(string tacky)
+int TagList::purge(string tacky)
 {
 	int len, iter, n=0;
 	len = tags.size();
@@ -217,7 +219,7 @@ int ETMMCL_TagList::purge(string tacky)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int ETMMCL_TagList::remove(string id)
+int TagList::remove(string id)
 {
 	int len, iter, n=0;
 	len = tags.size();
@@ -246,7 +248,7 @@ int ETMMCL_TagList::remove(string id)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ETMMCL_Map::ETMMCL_Map(string str)
+Map::Map(string str)
 : name_(str)
 , map_()
 , res_(0.01)
@@ -261,7 +263,7 @@ ETMMCL_Map::ETMMCL_Map(string str)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ETMMCL_Map::ETMMCL_Map(void)
+Map::Map(void)
 : name_()
 , map_()
 , res_(0.01)
@@ -275,7 +277,7 @@ ETMMCL_Map::ETMMCL_Map(void)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void ETMMCL_Map::write(FileStorage& fs) const
+void Map::write(FileStorage& fs) const
 {
 	fs	<< "{"
 		<< "name"			<< name_
@@ -294,7 +296,7 @@ void ETMMCL_Map::write(FileStorage& fs) const
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void ETMMCL_Map::read(const FileNode& node)
+void Map::read(const FileNode& node)
 {
 	node["name"]			>> name_;
 	node["map"]				>> map_;
@@ -308,7 +310,7 @@ void ETMMCL_Map::read(const FileNode& node)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int ETMMCL_Map::update(string str, ETMMCL_TagList tacky)
+int Map::update(string str, TagList tacky)
 {
 	if (str.compare("primary")==0)
 	{
@@ -334,10 +336,10 @@ int ETMMCL_Map::update(string str, ETMMCL_TagList tacky)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int ETMMCL_Map::purge(string str, string tacky)
+int Map::purge(string str, string tacky)
 {
 	int n=0;
-	ETMMCL_TagList *lister;
+	TagList *lister;
 	if (str.compare("primary")==0)
 	{
 		lister = &pri_;
@@ -355,8 +357,8 @@ int ETMMCL_Map::purge(string str, string tacky)
 		return n;
 	}
 
-	vector<ETMMCL_Tag>::iterator head = lister->tags.begin();
-	vector<ETMMCL_Tag>::iterator tail = lister->tags.end();
+	vector<Tag>::iterator head = lister->tags.begin();
+	vector<Tag>::iterator tail = lister->tags.end();
 
 	while (head != tail)
 	{
@@ -375,9 +377,9 @@ int ETMMCL_Map::purge(string str, string tacky)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int ETMMCL_Map::remove(string str, string id)
+int Map::remove(string str, string id)
 {
-	ETMMCL_TagList *lister;
+	TagList *lister;
 	if (str.compare("primary")==0)
 	{
 		lister = &pri_;
@@ -395,8 +397,8 @@ int ETMMCL_Map::remove(string str, string id)
 		return 0;
 	}
 
-	vector<ETMMCL_Tag>::iterator head = lister->tags.begin();
-	vector<ETMMCL_Tag>::iterator tail = lister->tags.end();
+	vector<Tag>::iterator head = lister->tags.begin();
+	vector<Tag>::iterator tail = lister->tags.end();
 
 	while (head != tail)
 	{
@@ -418,7 +420,7 @@ int ETMMCL_Map::remove(string str, string id)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int ETMMCL_Interface::pull_floorplan(string str)
+int Interface::pull_floorplan(string str)
 {
 	string filename = "./maps/" + str + ".xml";
 
@@ -431,7 +433,7 @@ int ETMMCL_Interface::pull_floorplan(string str)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int ETMMCL_Interface::push_floorplan(void)
+int Interface::push_floorplan(void)
 {
 	string filename = "./maps/" + map_.id() + ".xml";
 
@@ -451,9 +453,12 @@ int ETMMCL_Interface::push_floorplan(void)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ETMMCL::ETMMCL(void)
 : pz_()
+, ppz_()
 , pmin_(500)
 , pmax_(5000)
 , phi_(0.1)
+, dslow_(0.1)
+, dfast_(0.001)
 {
 
 }
@@ -462,23 +467,236 @@ ETMMCL::ETMMCL(void)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void ETMMCL::init(string str)
 {
+	// Create uniform distribution of particle over map
 
 }
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void ETMMCL::init(ETMMCL_Sample pos)
+void ETMMCL::init(Particle pos)
 {
-
+	// Create ~80% uniform distribution, ~15% with pos+noise, and ~5% with pos
 }
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void ETMMCL::spin(void)
+void ETMMCL::process(void)
 {
+	updateOdom();
+	updateText();
+	updateDist();
+	resample();
+
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+extern "C" {
+#include <gsl/gsl_randist.h>
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void ETMMCL::resample(void)
+{
+	// seed the rng
+	long seed = time (NULL);
+
+	// gsl rng pointer
+	gsl_rng *rng;
+	// gsl rng from discrete distribution
+	gsl_ran_discrete_t *rng_dd;
+
+	// create the gsl rng
+	rng = gsl_rng_alloc (gsl_rng_rand48);
+
+	// seed the gls rng
+	gsl_rng_set (rng, seed);
+
+
+	// Get particle weights into an array
+	size_t num_particles = pz_.size();
+	size_t iter;
+
+	double *W = new double[num_particles];
+
+	for (iter=0; iter<num_particles; iter++)
+	{
+		W[iter] = pz_[iter].w;
+	}
+
+	// Do gsl rng pre-processing for discrete distribution
+	rng_dd = gsl_ran_discrete_preproc(num_particles, W);
+
+
+	// Create a temp sample set
+	vector<Particle> potent;
+
+	do
+	{
+		/// Forward MCL (sample last set to get new particle)
+		if (gsl_ran_flat(rng,0,1) < (1-phi_))
+		{
+			size_t indi = gsl_ran_discrete(rng, rng_dd);
+
+			Particle prime = pz_[indi];
+
+			fmcl(prime);
+			potent.push_back(prime);
+		}
+		/// Dual MCL (generate new particle from observation)
+		else
+		{
+			Particle prime = dmcl();
+			potent.push_back(prime);
+		}
+
+	} while ( (!samples_sufficient) && (potent.size()>pmin_) && (potent.size()<pmax_) );
+
+
+
+
+	gsl_ran_discrete_free(rng_dd);
+	gsl_rng_free (rng);
+
+
 
 
 }
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void ETMMCL::fmcl(Particle& sampl)
+{
+	// Received new odometry, so update position
+	if (time_odom_last_ < odom_.timestamp)
+	{
+		double	tp;
+		int xp, yp;
+
+		// Transform X to X' using odom
+		xp = 0;
+		yp = 0;
+		tp = 0.0;
+
+		// Update pose
+		sampl.x = xp;
+		sampl.y = yp;
+		sampl.t = tp;
+	}
+	else
+	{
+		// No new odometry, so keep last position
+	}
+
+	// Received new observation
+	if (time_dist_last_ < dist_.timestamp)
+	{
+		// Get distance from bot to map wall
+		double d = mapper_.raytrace(sampl);
+
+		// Invalid sensor data and/or out of range
+		if (dist_.D > 1.8)
+		{
+			if (d > 1.8)
+			{
+				// if particle is far from wall, decay slow
+				sampl.w *= dslow_;
+			}
+			else
+			{
+				// if particle is close to wall, decay fast
+				sampl.w *= dfast_;
+			}
+		}
+		else
+		{
+			// Calculate new weight (arbitrary calculation)
+			double wp = (0.8) / abs(dist_.D - d);
+			if (wp > 2.0)
+			{
+				wp = 2.0;
+			}
+			sampl.w = wp;
+		}
+	}
+	else
+	{
+		// No new observation, so discount weight (slow)
+		sampl.w *= dslow_;
+	}
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Particle ETMMCL::dmcl(void)
+{
+	if (text_.is_empty())
+	{
+	}
+	else
+	{
+
+	}
+
+
+	// Received new observation
+	if (time_dist_last_ < dist_.timestamp)
+	{
+		// Get distance from bot to map wall
+		double d = mapper_.raytrace(sampl);
+
+		// Invalid sensor data and/or out of range
+		if (dist_.D > 1.8)
+		{
+			if (d > 1.8)
+			{
+				// if particle is far from wall, decay slow
+				sampl.w *= dslow_;
+			}
+			else
+			{
+				// if particle is close to wall, decay fast
+				sampl.w *= dfast_;
+			}
+		}
+		else
+		{
+			// Calculate new weight (arbitrary calculation)
+			double wp = (0.8) / abs(dist_.D - d);
+			if (wp > 2.0)
+			{
+				wp = 2.0;
+			}
+			sampl.w = wp;
+		}
+	}
+	else
+	{
+		// No new observation, so discount weight (slow)
+		sampl.w *= dslow_;
+	}
+
+
+	// Received new odometry, so update position
+	if (time_odom_last_ < odom_.timestamp)
+	{
+		double	tp;
+		int xp, yp;
+
+		// Transform X to X' using odom
+		xp = 0;
+		yp = 0;
+		tp = 0.0;
+
+		// Update pose
+		sampl.x = xp;
+		sampl.y = yp;
+		sampl.t = tp;
+	}
+	else
+	{
+		// No new odometry, so keep last position
+	}
+
+}
+
+}

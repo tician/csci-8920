@@ -97,33 +97,47 @@
 using namespace cv;
 using namespace std;
 
+namespace etmmcl
+{
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 typedef struct
 {
-	int			x,y;	// map coordinate/index (x,y)
-	double		t;		// bot orientation (theta)
-	double		w;		// weight of estimated pose
-} ETMMCL_Sample;
+	int					x,y;	// map coordinate/index (x,y)
+	double				t;		// bot orientation (theta)
+	double				w;		// weight of estimated pose
+} Particle;
 
 typedef struct
 {
-	string		s;		// retrieved text string
-	double		f;		// approximate font size (mm tall)
-	double		d;		// approximate distance (mm)
-	double		t;		// orientation (theta) of text relative to camera or base_link?
-} ETMMCL_EnvText;
+	string				s;		// retrieved text string
+	double				f;		// approximate font size (mm tall)
+	double				d;		// approximate distance (mm)
+	double				t;		// orientation (theta) of text relative to camera or base_link?
+} EnvText;
+
+typedef struct
+{
+	struct
+	{
+		double			D;
+		double			T;
+	} Pole;
+
+	vector<Pole> 		scans;
+	int					timestamp;
+} DistanceScan;
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class ETMMCL_Tag
+class Tag
 {
 public:
-	ETMMCL_Tag(string,string);
-	ETMMCL_Tag(void);
+	Tag(string,string);
+	Tag(void);
 
 // Only (int, float, double and string) are permitted with filestorage (unsigned not allowed, yet)
 
@@ -132,7 +146,7 @@ public:
 	string				tag;		// Text tag
 	int					x,y;		// (X,Y) position
 	double				font;		// Approximate font height
-	double				w;			// weight/confidence?
+//	double				w;			// weight/confidence?
 
 public:
 	void write(FileStorage& fs) const;
@@ -142,12 +156,12 @@ public:
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-static void write(FileStorage& fs, const std::string&, const ETMMCL_Tag& x)
+static void write(FileStorage& fs, const std::string&, const Tag& x)
 {
     x.write(fs);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-static void read(const FileNode& node, ETMMCL_Tag& x, const ETMMCL_Tag& default_value = ETMMCL_Tag())
+static void read(const FileNode& node, Tag& x, const Tag& default_value = Tag())
 {
     if(node.empty())
         x = default_value;
@@ -159,34 +173,34 @@ static void read(const FileNode& node, ETMMCL_Tag& x, const ETMMCL_Tag& default_
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class ETMMCL_TagList
+class TagList
 {
 public:
 
-	ETMMCL_TagList(string);
-	ETMMCL_TagList(void);
+	TagList(string);
+	TagList(void);
 
 	string				name;		// Name of TagList
 	int					num;		// Number of tags in list
-	vector<ETMMCL_Tag>	tags;		// Vector of tags
+	vector<Tag>			tags;		// Vector of tags
 
 	void write(FileStorage&) const;
 	void read(const FileNode&);
 
-	vector<ETMMCL_Tag> get(string);
-	int add(ETMMCL_Tag);
+	vector<Tag> get(string);
+	int add(Tag);
 	int purge(string);
 	int remove(string);
 
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-static void write(FileStorage& fs, const std::string&, const ETMMCL_TagList& x)
+static void write(FileStorage& fs, const std::string&, const TagList& x)
 {
     x.write(fs);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-static void read(const FileNode& node, ETMMCL_TagList& x, const ETMMCL_TagList& default_value = ETMMCL_TagList())
+static void read(const FileNode& node, TagList& x, const TagList& default_value = TagList())
 {
     if(node.empty())
         x = default_value;
@@ -200,11 +214,11 @@ static void read(const FileNode& node, ETMMCL_TagList& x, const ETMMCL_TagList& 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class ETMMCL_Map
+class Map
 {
 public:
-	ETMMCL_Map(string);
-	ETMMCL_Map(void);
+	Map(string);
+	Map(void);
 
 private:
 	string				name_;		// Floorplan name
@@ -213,13 +227,13 @@ private:
 	int					y_;			// Map origin Y
 	double				res_;		// Map resolution (m/pixel)
 
-	ETMMCL_TagList		pri_;		// Primary (immutable) TagList
-	ETMMCL_TagList		sec_;		// Secondary (human-set) TagList
-	ETMMCL_TagList		ter_;		// Tertiary (auto-set) TagList
+	TagList				pri_;		// Primary (immutable) TagList
+	TagList				sec_;		// Secondary (human-set) TagList
+	TagList				ter_;		// Tertiary (auto-set) TagList
 
 public:
-	int update(string, ETMMCL_TagList);
-//	int add(ETMMCL_Tag);
+	int update(string, TagList);
+//	int add(Tag);
 	int purge(string, string);
 	int remove(string, string);
 
@@ -230,12 +244,12 @@ public:
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-static void write(FileStorage& fs, const std::string&, const ETMMCL_Map& x)
+static void write(FileStorage& fs, const std::string&, const Map& x)
 {
     x.write(fs);
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-static void read(const FileNode& node, ETMMCL_Map& x, const ETMMCL_Map& default_value = ETMMCL_Map())
+static void read(const FileNode& node, Map& x, const Map& default_value = Map())
 {
     if(node.empty())
         x = default_value;
@@ -265,20 +279,20 @@ static void read(const FileNode& node, ETMMCL_Map& x, const ETMMCL_Map& default_
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class ETMMCL_Interface
+class Interface
 {
 private:
 	int pull_floorplan(string);
 	int push_floorplan(void);
 
-	ETMMCL_Map map_;
+	Map map_;
 
 public:
 	int pull(string str)	{return pull_floorplan(str);}
 	int push(void)			{return push_floorplan();}
 	string id(void)		{return map_.id();}
 
-	vector<ETMMCL_Sample> sample(vector<ETMMCL_EnvText>&);
+	vector<Particle> sample(vector<EnvText>&);
 };
 
 
@@ -287,24 +301,51 @@ public:
 
 
 /**
- MMCL:
-  phi~0.1
-  m is variable depending on available cycles and confidence in pose and text
+  odom_
+  env_text_
+  sample_set_
+
 
   init()
     sample_set = uniform_dist[x,y] with all w=(1/pmax_) and timestamp=now();
-    time_odom_last_ = odom.timestamp || 1979;
-    time_text_last_ = text.timestamp || 1979;
-    time_sampled_last_ = sample_set.timestamp;
+    time_odom_last_ = odom_.timestamp || 1979;
+    time_text_last_ = env_text_.timestamp || 1979;
+    time_sampled_last_ = sample_set_.timestamp;
 
+  end
 
-  process(void)
+  process()
     if (odom_.timestamp > time_odom_last_)
-      new_sample_set = FMCL(sample_set, odom);
 
     end
 
+    for iter=1:1:m
+      if urand(0,1)<(1-phi)
+        generate random last pose x from X based on pose weight w (roulette or tournament?)
+        generate random current pose x' from P(x'|x,a) = P(pose_now|pose_last,movement)
+        estimate weight w' of pose x' from P(o|x') = P(text/wall_distance,obs_text|pose_now)
+        add <x',w'> to <X',W'>
+      else
+        generate random current pose x' from P(x'|o) = P(pose_now|text/wall_distance,obs_text)
+            (weighted: pri > sec >> ter)
+        generate random last pose x from P(x'|x,a) = P(pose_now|pose_last,movement)
+        estimate weight w' of pose x' from tag confidence and ~weight w of x
+        add <x',w'> to <X',W'>
+      end
+    end
 
+
+    time_odom_last_ = odom_.timestamp;
+    time_text_last_ = text_.timestamp;
+    time_sampled_last_ = time();
+
+  end
+
+
+ MMCL:
+  phi~0.1
+  m is variable depending on available cycles and confidence in pose and text
+  process()
     for iter=1:1:m
       if urand(0,1)<(1-phi)
         generate random last pose x from X based on pose weight w (roulette or tournament?)
@@ -325,80 +366,38 @@ public:
 */
 
 
-extern "C" {
-#include <gsl/gsl_randist.h>
-}
-vector<ETMMCL_Sample> FMCL::resample(vector<ETMMCL_Sample> current_set)
-{
-	size_t num_particles = current_set.size();
-	size_t iter;
-	double *W = new double[num_particles];
-
-	for (iter=0; iter<num_particles; iter++)
-	{
-		W[iter] = current_set[iter].w;
-	}
-	vector<ETMMCL_Sample> next_set;
-
-
-
-
-	long seed = time (NULL);
-
-	gsl_rng *rng;
-	gsl_ran_discrete_t *rng_dd;
-
-	rng = gsl_rng_alloc (gsl_rng_rand48);
-
-	gsl_rng_set (rng, seed);
-	rng_dd = gsl_ran_discrete_preproc(num_particles, W);
-
-	do
-	{
-		for (iter=0; iter<pmin_; iter++)
-		{
-			size_t indi = gsl_ran_discrete(rng, rng_dd);
-			next_set.push_back( current_set[indi] );
-		}
-	} while ( (!samples_sufficient) && (next_set.size()<pmax_) );
-
-
-	gsl_ran_discrete_free(rng_dd);
-	gsl_rng_free (rng);
-
-
-	return next_set;
-}
-
-class FMCL
-{
-
-
-};
-
-class DMCL
-{
-
-
-};
 
 class ETMMCL
 {
 private:
-	vector<ETMMCL_Sample>	pz_;			// Particles
-	int 					pmin_, pmax_;	// Min/Max number particles
-	double					phi_;			// Mixture rate
+	vector<Particle>	pz_;			// Set of Particles
+	int 				pmin_, pmax_;	// Min/Max number particles
+	double				phi_;			// Mixture rate
 
-	ETMMCL_Interface		mapper;
+	double				dslow_, dfast_;	// Slow and Fast decay factors
+
+	Interface	mapper_;
+
+	vector<Particle>	text_;			// Set of Particles from text tags (empty if none)
+	DistanceScan		dist_;			// Set of distance scans at time
+
+	int					time_odom_last_;
+	int					time_dist_last_;
+	int					time_sampled_last_;
+
+	void resample(void);
+	void fmcl(Particle&);
+	Particle dmcl(void);
 
 public:
 	ETMMCL(void);
 	void init(string);
-	void init(ETMMCL_Sample);
+	void init(Particle);
 
-	void spin(void);
+	void process(void);
 
 
 };
 
+}
 #endif
