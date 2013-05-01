@@ -17,124 +17,24 @@ int main(int argc, char* argv[])
 	string filename = "./tempy.xml.gz";
 	int iter, r;
 
-	etmmcl::Map mapper("test");
+	etmmcl::Map mapper;
 
-	etmmcl::TagList *lister;
-
-	FileStorage fs(filename, FileStorage::WRITE);
-
-	etmmcl::Tag tagster;
-
-	lister = new etmmcl::TagList("primary");
-
-	for (iter=0; iter<5; iter++)
-	{
-		r = system("uuidgen >> output");
-		fstream fin("output");
-		getline(fin, tagster.uuid);
-		fin.close();
-		r = system("rm output");
-		tagster.time = iter+1;
-
-		lister->add(tagster);
-	}
-
-
-	r = mapper.update("primary", *lister);
-	assert( r == iter );
-
-
-
-	delete lister;
-	lister = new etmmcl::TagList("secondary");
-
-
-	for (iter=0; iter<7; iter++)
-	{
-		r= system("uuidgen >> output");
-		fstream fin("output");
-		getline(fin, tagster.uuid);
-		fin.close();
-		r = system("rm output");
-		tagster.time = iter+1;
-
-		lister->add(tagster);
-	}
-
-	r = mapper.update("secondary", *lister);
-	assert( r == iter );
-
-
-// purge does not work
-//	cout << lister.purge("") << endl;
-
-
-	delete lister;
-	lister = new etmmcl::TagList("tertiary");
-
-
-	for (iter=0; iter<3; iter++)
-	{
-		r= system("uuidgen >> output");
-		fstream fin("output");
-		getline(fin, tagster.uuid);
-		fin.close();
-		r = system("rm output");
-		tagster.time = iter+1;
-
-		lister->add(tagster);
-	}
-
-	r = mapper.update("tertiary", *lister);
-	assert( r == iter );
-
-
-
-	fs << "ETMMCL_Map" << mapper;
-
-
-
-
-
-	return 0;
-
-/*
-	{
-	FileStorage fs(filename, FileStorage::WRITE);
-
-	ETMMCL_Tag tagster;
-	ETMMCL_TagList lister("primary");
-
-	for (int iter=0; iter<5; iter++)
-	{
-		int r= system("uuidgen >> output");
-		fstream fin("output");
-		getline(fin, tagster.uuid);
-		r = system("rm output");
-		tagster.time = iter+1;
-
-		lister.add(tagster);
-	}
-
-	fs << lister.name << lister;
-	}
-
-	{
 	FileStorage fs(filename, FileStorage::READ);
 
-    if (!fs.isOpened())
+	if (!fs.isOpened())
     {
       cerr << "failed to open " << filename << endl;
       return 1;
     }
 
-	ETMMCL_TagList custer;
-	fs["primary"] >> custer;
+	fs["ETMMCL_Map"] >> mapper;
 
-	cout << "length: " << custer.num << endl;
-	}
+	cout << "Map Name: " << mapper.id() << endl;
+	cout << "Pri Name: " << mapper.pri_.name << endl;
+	cout << "Sec Name: " << mapper.sec_.name << endl;
+	cout << "Ter Name: " << mapper.ter_.name << endl;
 
-*/
+
 	return 0;
 
 /*

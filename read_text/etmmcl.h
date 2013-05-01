@@ -237,11 +237,11 @@ private:
 	int					y_;			// Map origin Y
 	double				res_;		// Map resolution (m/pixel)
 
+public:
 	TagList				pri_;		// Primary (immutable) TagList
 	TagList				sec_;		// Secondary (human-set) TagList
 	TagList				ter_;		// Tertiary (auto-set) TagList
 
-public:
 	int update(string, TagList);
 //	int add(Tag);
 	int purge(string, string);
