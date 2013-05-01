@@ -340,6 +340,15 @@ int Map::update(string str, TagList tacky)
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+int Map::update(string str, Mat m)
+{
+	name_ = str;
+	map_ = m.clone();
+	return 0;
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int Map::purge(string str, string tacky)
 {
 	int n=0;

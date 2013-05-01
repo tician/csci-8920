@@ -2,16 +2,9 @@
 #include <fstream>
 #include <cstdio>
 
-
 #include "etmmcl.h"
 
-// Our window title/name (can be anything you want, obviously)
-const char* WIN_DOH = "Yum, donuts";
-#ifdef RUNNING_DETECTOR
-const char* WIN_DER = "Holy macaroni";
-#endif
-
-int main(int argc, char* argv[])
+int map_maker(void)
 {
 	string filename = "./tempy.xml.gz";
 	int iter, r;
@@ -88,6 +81,9 @@ int main(int argc, char* argv[])
 	assert( r == iter );
 
 
+
+	Mat map = imread("./map_image.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+	r = mapper.update("testee", map);
 
 	fs << "ETMMCL_Map" << mapper;
 

@@ -1,9 +1,8 @@
-//#include "text_detect.h"
 #include <iostream>
 #include <fstream>
 #include <cstdio>
 
-
+#include "text_detect.h"
 #include "etmmcl.h"
 
 // Our window title/name (can be anything you want, obviously)
@@ -12,33 +11,8 @@ const char* WIN_DOH = "Yum, donuts";
 const char* WIN_DER = "Holy macaroni";
 #endif
 
-int main(int argc, char* argv[])
+int run_detection(int argc, char* argv[])
 {
-	string filename = "./tempy.xml.gz";
-	int iter, r;
-
-	etmmcl::Map mapper;
-
-	FileStorage fs(filename, FileStorage::READ);
-
-	if (!fs.isOpened())
-    {
-      cerr << "failed to open " << filename << endl;
-      return 1;
-    }
-
-	fs["ETMMCL_Map"] >> mapper;
-
-	cout << "Map Name: " << mapper.id() << endl;
-	cout << "Pri Name: " << mapper.pri_.name << endl;
-	cout << "Sec Name: " << mapper.sec_.name << endl;
-	cout << "Ter Name: " << mapper.ter_.name << endl;
-
-
-	return 0;
-
-/*
-
 #ifdef RUNNING_DETECTOR
 	DetectText detector = DetectText();
 	detector.readLetterCorrelation(argv[1]);
@@ -123,11 +97,10 @@ int main(int argc, char* argv[])
 	}
 
 
-*/
 /*
 	if (argc < 4)
 	{
-		cout << "not enought input: detect_text <image> <correlation> <dictionary>"
+		cout << "not enough input: detect_text <image> <correlation> <dictionary>"
 		<< endl;
 		return -1;
 	}

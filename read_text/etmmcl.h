@@ -87,7 +87,7 @@
 #define ETMMCL_INTERFACE_H
 
 #include "opencv2/core/core.hpp"
-//#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/highgui/highgui.hpp"
 //#include "opencv2/imgproc/imgproc.hpp"
 
 #include <iostream>
@@ -243,6 +243,7 @@ public:
 	TagList				ter_;		// Tertiary (auto-set) TagList
 
 	int update(string, TagList);
+	int update(string, Mat);
 //	int add(Tag);
 	int purge(string, string);
 	int remove(string, string);
