@@ -14,7 +14,7 @@ const char* WIN_DER = "Holy macaroni";
 
 int main(int argc, char* argv[])
 {
-	string filename = "./tempy.xml.bz2";
+	string filename = "./tempy.xml.gz";
 	int iter, r;
 
 	etmmcl::Map mapper("test");
