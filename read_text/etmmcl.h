@@ -109,7 +109,13 @@ typedef struct Particle
 	int					x,y;	// map coordinate/index (x,y)
 	double				t;		// bot orientation (theta)
 	double				w;		// weight of estimated pose
-};
+} Particle;
+
+typedef struct
+{
+	vector<Particle>	pv;
+	int					timestamp;
+} TextSeed;
 
 typedef struct
 {
@@ -125,11 +131,12 @@ typedef struct
 	double				D;
 	double				T;
 } PolCoor;
+
 typedef struct
 {
 	vector<PolCoor>		scans;
 	int					timestamp;
-} DistanceScan;
+} SharpScan;
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -389,10 +396,13 @@ private:
 		int				timestamp;
 	};
 
-	vector<Odometry>	history_;
-	Odometry			odom_;
-	vector<EnvText>		text_;			// Set of Particles from text tags (empty if none)
-	DistanceScan		dist_;			// Set of distance scans at time
+	vector<Odometry>	odom_q_;		// Odometry Queue
+	vector<TextSeed>	text_q_;		// Text Queue
+	vector<SharpScan>	dist_q_;		// Scanner Queue
+
+	Odometry			odom_;			// Odometry
+	TextSeed			text_;			// Set of Particles from text tags
+	SharpScan			dist_;			// Set of distance scans
 
 	int					time_odom_last_;
 	int					time_dist_last_;
@@ -403,9 +413,9 @@ private:
 	Particle dmcl(void);
 
 
-	void updateOdom() {return;}
-	void updateText() {return;}
-	void updateDist() {return;}
+	void updateOdom(void) {return;}
+	void updateText(void) {return;}
+	void updateDist(void) {return;}
 
 public:
 	ETMMCL(void);
@@ -414,7 +424,9 @@ public:
 
 	void process(void);
 
-
+	int push(Odometry od)	{odom_q_.push_back(od); return odom_q_.size();}
+	int push(TextSeed ts)	{text_q_.push_back(ts); return text_q_.size();}
+	int push(SharpScan ss)	{dist_q_.push_back(ss); return dist_q_.size();}
 };
 
 }

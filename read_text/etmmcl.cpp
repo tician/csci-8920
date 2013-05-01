@@ -255,9 +255,9 @@ int TagList::remove(string id)
 Map::Map(string str)
 : name_(str)
 , map_()
-, res_(0.01)
 , x_(0)
 , y_(0)
+, res_(0.01)
 , pri_()
 , sec_()
 , ter_()
@@ -270,9 +270,9 @@ Map::Map(string str)
 Map::Map(void)
 : name_()
 , map_()
-, res_(0.01)
 , x_(0)
 , y_(0)
+, res_(0.01)
 , pri_()
 , sec_()
 , ter_()
@@ -285,13 +285,13 @@ void Map::write(FileStorage& fs) const
 {
 	fs	<< "{"
 		<< "name"			<< name_
-		<< "map"			<< map_
 		<< "res"			<< res_
 		<< "origin_x"		<< x_
 		<< "origin_y"		<< y_
 		<< "primary"		<< pri_
 		<< "secondary"		<< sec_
 		<< "tertiary"		<< ter_
+		<< "map"			<< map_
 //		<< pri_.name		<< pri_
 //		<< sec_.name		<< sec_
 //		<< ter_.name		<< ter_
@@ -303,13 +303,13 @@ void Map::write(FileStorage& fs) const
 void Map::read(const FileNode& node)
 {
 	node["name"]			>> name_;
-	node["map"]				>> map_;
 	node["res"]				>> res_;
 	node["origin_x"]		>> x_;
 	node["origin_y"]		>> y_;
 	node["primary"]			>> pri_;
 	node["secondary"]		>> sec_;
 	node["tertiary"]		>> ter_;
+	node["map"]				>> map_;
 }
 
 
@@ -639,7 +639,7 @@ Particle ETMMCL::dmcl(void)
 {
 	Particle sampl;
 
-	if (text_.size() > 0)
+	if (text_.pv.size() > 0)
 	{
 
 	}
@@ -708,6 +708,7 @@ Particle ETMMCL::dmcl(void)
 		// No new odometry, so keep last position
 	}
 
+	return sampl;
 }
 
 }

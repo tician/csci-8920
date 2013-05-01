@@ -14,18 +14,18 @@ const char* WIN_DER = "Holy macaroni";
 
 int main(int argc, char* argv[])
 {
-	string filename = "./tempy.xml";
+	string filename = "./tempy.xml.bz2";
 	int iter, r;
 
-	ETMMCL_Map mapper("test");
+	etmmcl::Map mapper("test");
 
-	ETMMCL_TagList *lister;
+	etmmcl::TagList *lister;
 
 	FileStorage fs(filename, FileStorage::WRITE);
 
-	ETMMCL_Tag tagster;
+	etmmcl::Tag tagster;
 
-	lister = new ETMMCL_TagList("primary");
+	lister = new etmmcl::TagList("primary");
 
 	for (iter=0; iter<5; iter++)
 	{
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 
 
 	delete lister;
-	lister = new ETMMCL_TagList("secondary");
+	lister = new etmmcl::TagList("secondary");
 
 
 	for (iter=0; iter<7; iter++)
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 
 
 	delete lister;
-	lister = new ETMMCL_TagList("tertiary");
+	lister = new etmmcl::TagList("tertiary");
 
 
 	for (iter=0; iter<3; iter++)
