@@ -312,6 +312,51 @@ public:
 */
 
 
+extern "C" {
+#include <gsl/gsl_randist.h>
+}
+vector<ETMMCL_Sample> resample(vector<ETMMCL_Sample> current_set)
+{
+	size_t num_particles = current_set.size();
+	size_t iter;
+	double *W = new double[num_particles];
+
+	for (iter=0; iter<num_particles; iter++)
+	{
+		W[iter] = current_set[iter].w;
+	}
+	vector<ETMMCL_Sample> next_set;
+
+
+
+
+	long seed = time (NULL);
+
+	gsl_rng *rng;
+	gsl_ran_discrete_t *rng_dd;
+
+	rng = gsl_rng_alloc (gsl_rng_rand48);
+
+	gsl_rng_set (rng, seed);
+	rng_dd = gsl_ran_discrete_preproc(num_particles, W);
+
+//	do
+//	{
+		for (iter=0; iter<num_particles; iter++)
+		{
+			size_t indi = gsl_ran_discrete(rng, rng_dd);
+			next_set.push_back( current_set[indi] );
+		}
+//	} while (!samples_sufficient);
+
+
+	gsl_ran_discrete_free(rng_dd);
+	gsl_rng_free (rng);
+
+
+	return next_set;
+}
+
 class FMMCL
 {
 
