@@ -4,8 +4,8 @@
 	<File name="etmmcl.cpp" open="1" top="0" tabpos="5">
 		<Cursor position="7582" topLine="309" />
 	</File>
-	<File name="etmmcl.h" open="1" top="0" tabpos="4">
-		<Cursor position="8176" topLine="233" />
+	<File name="etmmcl.h" open="1" top="1" tabpos="4">
+		<Cursor position="4538" topLine="141" />
 	</File>
 	<File name="main.cpp" open="1" top="0" tabpos="6">
 		<Cursor position="509" topLine="7" />
@@ -13,7 +13,7 @@
 	<File name="map_maker.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="1424" topLine="0" />
 	</File>
-	<File name="run_detection.cpp" open="1" top="1" tabpos="3">
+	<File name="run_detection.cpp" open="1" top="0" tabpos="3">
 		<Cursor position="166" topLine="0" />
 	</File>
 	<File name="text_detect.cpp" open="1" top="0" tabpos="2">

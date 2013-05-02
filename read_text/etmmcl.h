@@ -34,15 +34,11 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  Basically...
   -Every tag consists of: a location, a string, a uuid, a timestamp,
-    an approximate font size (mm tall), and a confidence (how common
-	 is this string of text and how likely is it that it has actually
-	 been encountered).
-  -Every taglist constists of multiple tags and a length counter.
-  -Every map consists of three taglists (primary, secondary, and tertiary),
-    as well as a map image, map resolution, map origin, and map name.
-     Primary   - Immutable        - Room numbers
-     Secondary - Human changeable - Uncommon text tags
-     Tertiary  - Auto-added       - Misc. text tags
+    and an approximate font size (mm tall).
+  -Every taglist constists of multiple tags and a taglist weight.
+  -Every map consists of a vector of taglists as well as a map image,
+    map resolution, map origin, and map name. (primary, secondary,
+    and tertiary taglists were default, but why limit it to three?)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,9 +233,10 @@ private:
 	int					y_;			// Map origin Y
 	double				res_;		// Map resolution (m/pixel)
 
-	TagList				pri_;		// Primary (immutable) TagList
-	TagList				sec_;		// Secondary (human-set) TagList
-	TagList				ter_;		// Tertiary (auto-set) TagList
+	vector<TagList>		tags_;
+//	TagList				pri_;		// Primary (immutable) TagList
+//	TagList				sec_;		// Secondary (human-set) TagList
+//	TagList				ter_;		// Tertiary (auto-set) TagList
 
 public:
 	int update(string, TagList);
@@ -330,22 +327,27 @@ public:
   end
 
   process()
-    if (odom_.timestamp > time_odom_last_)
+    UpdateTextDetection()
+    UpdateOdometry()
+    UpdateDistanceScans()
 
-    end
-
-    for iter=1:1:m
+    while (1)
       if urand(0,1)<(1-phi)
-        generate random last pose x from X based on pose weight w (roulette or tournament?)
-        generate random current pose x' from P(x'|x,a) = P(pose_now|pose_last,movement)
-        estimate weight w' of pose x' from P(o|x') = P(text/wall_distance,obs_text|pose_now)
-        add <x',w'> to <X',W'>
+        Randomly sample a particle x from X based on distribution of weights
+        Perform odometry transform to get the new pose x' of the particle
+        Estimate weight w' of particle as f( x', Set of distance scans, observed text, map ray tracing )
+        Add <x',w'> to <X',W'>
       else
-        generate random current pose x' from P(x'|o) = P(pose_now|text/wall_distance,obs_text)
-            (weighted: pri > sec >> ter)
-        generate random last pose x from P(x'|x,a) = P(pose_now|pose_last,movement)
-        estimate weight w' of pose x' from tag confidence and ~weight w of x
-        add <x',w'> to <X',W'>
+        Randomly generate pose x' consistent with text and distance scans
+        Perform reverse odometry transform to get 'previous' pose x
+        Estimate weight w' of particle as f( x, Set of distance scans, observed text, map ray tracing )
+        Add <x',w'> to <X',W'>
+      end
+
+
+
+      if ( (cummulative weight > threshold) || (number particles > upper limit) || ((time()-time_sampled_last_) > timeout) )
+        break
       end
     end
 
@@ -354,29 +356,6 @@ public:
     time_text_last_ = text_.timestamp;
     time_sampled_last_ = time();
 
-  end
-
-
- MMCL:
-  phi~0.1
-  m is variable depending on available cycles and confidence in pose and text
-  process()
-    for iter=1:1:m
-      if urand(0,1)<(1-phi)
-        generate random last pose x from X based on pose weight w (roulette or tournament?)
-        generate random current pose x' from P(x'|x,a) = P(pose_now|pose_last,movement)
-        estimate weight w' of pose x' from P(o|x') = P(text/wall_distance,obs_text|pose_now)
-        add <x',w'> to <X',W'>
-      else
-        generate random current pose x' from P(x'|o) = P(pose_now|text/wall_distance,obs_text)
-            (weighted: pri > sec >> ter)
-        generate random last pose x from P(x'|x,a) = P(pose_now|pose_last,movement)
-        estimate weight w' of pose x' from tag confidence and ~weight w of x
-        add <x',w'> to <X',W'>
-      end
-    end
-    normalize W'
-    <X,W> = <X',W'>
   end
 */
 
