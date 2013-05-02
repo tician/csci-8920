@@ -140,7 +140,7 @@ void TagList::read(const FileNode& node)
 	int iter, n;
 	node["weight"] >> weight;
 	node["length"] >> n;
-	std::cout << n << endl;
+//	std::cout << n << endl;
 	stringstream stst (stringstream::in | stringstream::out);
 
 	for (iter=0; iter<n; iter++)
@@ -428,6 +428,54 @@ int Map::remove(string str, string id)
 }
 
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+vector<Particle> Map::check(string str)
+{
+	vector<Particle> matches;
+
+	// Search taglists of map
+
+	// Generate particles
+
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+double Map::raytrace(Particle pv)
+{
+	// Check if particle is already out of valid map area
+	if ( map_.at<unsigned char>(pv.x,pv.y) < 255 )
+		return -2.0;
+
+	// Just to be safe
+	double theta = atan2(sin(pv.t), cos(pv.t));
+
+	int iter = 1;
+	while(iter>0)
+	{
+		int yp = round(pv.y + sin(theta)*iter);
+		int xp = round(pv.x + cos(theta)*iter);
+
+		if ( map_.at<unsigned char>(xp,yp) < 255 )
+		{
+			double len = sqrt( (double)((xp-pv.x)*(xp-pv.x)) + ((double)(yp-pv.y)*(yp-pv.y)) ) * res_;
+			if (len > 0.0)
+				return len;
+			else
+				return 0.0;
+		}
+
+		if (yp < 0 || xp < 0 || yp >= map_.rows || xp >= map_.cols)
+			return -1.0;
+
+		iter++;
+	}
+	return -3.0;
+}
+
+
+
+
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -456,6 +504,7 @@ int Interface::push_floorplan(void)
 
 	return 0;
 }
+
 
 
 
@@ -611,9 +660,9 @@ void ETMMCL::fmcl(Particle& sampl)
 		double d = mapper_.raytrace(sampl);
 
 		// Invalid sensor data and/or out of range
-		if (dist_.scans[0].D > 1.8)
+		if (dist_.scans[0].D > 1.4)
 		{
-			if (d > 1.8)
+			if (d > 1.4)
 			{
 				// if particle is far from wall, decay slow
 				sampl.w *= dslow_;
@@ -648,9 +697,9 @@ Particle ETMMCL::dmcl(void)
 {
 	Particle sampl;
 
-	if (text_.pv.size() > 0)
+	if (text_.pz.size() > 0)
 	{
-
+		// Have useful text tag particles
 	}
 	else
 	{
@@ -665,9 +714,9 @@ Particle ETMMCL::dmcl(void)
 		double d = mapper_.raytrace(sampl);
 
 		// Invalid sensor data and/or out of range
-		if (dist_.scans[0].D > 1.8)
+		if (dist_.scans[0].D > 1.4)
 		{
-			if (d > 1.8)
+			if (d > 1.4)
 			{
 				// if particle is far from wall, decay slow
 				sampl.w *= dslow_;

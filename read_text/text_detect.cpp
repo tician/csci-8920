@@ -1007,8 +1007,10 @@ DetectText::spellCheck(string& str, string& output, int method)
 	}
 	else
 	{
-//		output = str;
-//		return 9;
+#ifdef BYPASS_SPELLCHECK
+		output = str;
+		return 9;
+#endif
 		if (method == 1)
 		{
 			const string command("echo " + withoutStrangeMarks +

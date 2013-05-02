@@ -113,7 +113,7 @@ typedef struct Particle
 
 typedef struct
 {
-	vector<Particle>	pv;
+	vector<Particle>	pz;
 	int					timestamp;
 } TextSeed;
 
@@ -237,11 +237,11 @@ private:
 	int					y_;			// Map origin Y
 	double				res_;		// Map resolution (m/pixel)
 
-public:
 	TagList				pri_;		// Primary (immutable) TagList
 	TagList				sec_;		// Secondary (human-set) TagList
 	TagList				ter_;		// Tertiary (auto-set) TagList
 
+public:
 	int update(string, TagList);
 	int update(string, Mat);
 //	int add(Tag);
@@ -252,6 +252,9 @@ public:
 	void read(const FileNode&);
 
 	string id(void) {return name_;}
+
+	double raytrace(Particle);
+	vector<Particle> check(string);
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -304,7 +307,7 @@ public:
 	string id(void)		{return map_.id();}
 
 	vector<Particle> sample(vector<EnvText>&);
-	double raytrace(Particle) {return 0.0;}
+	double raytrace(Particle pv) {return map_.raytrace(pv);}
 };
 
 

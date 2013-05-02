@@ -28,10 +28,6 @@ int main(int argc, char* argv[])
 	fs["ETMMCL_Map"] >> mapper;
 
 	cout << "Map Name: " << mapper.id() << endl;
-	cout << "Pri Name: " << mapper.pri_.name << endl;
-	cout << "Sec Name: " << mapper.sec_.name << endl;
-	cout << "Ter Name: " << mapper.ter_.name << endl;
-
 
 	return 0;
 
