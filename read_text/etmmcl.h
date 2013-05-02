@@ -46,9 +46,9 @@
  Environmental Text Extraction via Stroke Width Transform
   Canny-edge -> sobel(x,y) -> gradient at edges -> stroke width of blob
    if mostly constant stroke width, then likely text -> send to tesseract
-  recovered text -> primary tag list   -> high confidence   P(x'|o)
-  recovered text -> secondary tag list -> medium confidence P(x'|o)
-  recovered text -> tertiary tag list  -> low confidence    P(x'|o)
+  recovered text -> primary tag list   -> high weight   P(x'|o)
+  recovered text -> secondary tag list -> medium weight P(x'|o)
+  recovered text -> tertiary tag list  -> low weight    P(x'|o)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -65,7 +65,7 @@
         estimate weight w' of pose x' from P(o|x')
         add <x',w'> to X'
       else
-        generate random current pose x' from P(x'|o) (weighted: pri > sec >> ter)
+        generate random current pose x' from P(x'|o)
         generate random last pose x from P(x'|x,a)
         estimate weight w' of pose x' from tag confidence and ~weight w of x
         add <x',w'> to <X',W'>
