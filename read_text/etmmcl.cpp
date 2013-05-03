@@ -258,9 +258,7 @@ Map::Map(string str)
 , x_(0)
 , y_(0)
 , res_(0.01)
-, pri_()
-, sec_()
-, ter_()
+, tags_()
 {
 	// pass desired map name
 }
@@ -273,9 +271,7 @@ Map::Map(void)
 , x_(0)
 , y_(0)
 , res_(0.01)
-, pri_()
-, sec_()
-, ter_()
+, tags_()
 {
 }
 
@@ -287,14 +283,20 @@ void Map::write(FileStorage& fs) const
 		<< "name"			<< name_
 		<< "res"			<< res_
 		<< "origin_x"		<< x_
-		<< "origin_y"		<< y_
-		<< "primary"		<< pri_
-		<< "secondary"		<< sec_
-		<< "tertiary"		<< ter_
+		<< "origin_y"		<< y_;
+
+	vector<string> listnames;
+
+	int numlists = tags_.size();
+	int iter;
+	for (iter=0; iter<numlists; iter++)
+	{
+		fs << tags_.at(iter).name << tags_.at(iter);
+		listnames.push_back(tags_.at(iter).name);
+	}
+
+	fs	<< "lists"			<< listnames
 		<< "map"			<< map_
-//		<< pri_.name		<< pri_
-//		<< sec_.name		<< sec_
-//		<< ter_.name		<< ter_
 		<< "}";
 }
 
@@ -306,36 +308,42 @@ void Map::read(const FileNode& node)
 	node["res"]				>> res_;
 	node["origin_x"]		>> x_;
 	node["origin_y"]		>> y_;
-	node["primary"]			>> pri_;
-	node["secondary"]		>> sec_;
-	node["tertiary"]		>> ter_;
+
 	node["map"]				>> map_;
+
+	vector<string> listnames;
+	node["lists"]			>> listnames;
+
+	int numlists = listnames.size();
+	int iter;
+	for (iter=0; iter<numlists; iter++)
+	{
+		TagList tempy;
+		node[listnames.at(iter)]	>> 	tempy;
+		tags_.push_back(tempy);
+	}
+
 }
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-int Map::update(string str, TagList tacky)
+int Map::update(TagList tacky)
 {
-	if (str.compare("primary")==0)
+	int numlists = tags_.size();
+	int iter;
+	for (iter=0; iter<numlists; iter++)
 	{
-		pri_ = tacky;//.clone();
-//		cout << "primary set: " << pri_.num << endl;
-		return pri_.num;
+		string iname = tags_.at(iter).name;
+		if (tacky.name.compare(iname)==0)
+		{
+			tags_.erase(tags_.begin()+iter);
+			tags_.push_back(tacky);
+			return tags_.back().num;
+		}
 	}
-	else if (str.compare("secondary")==0)
-	{
-		sec_ = tacky;//.clone();
-//		cout << "secondary set: " << sec_.num << endl;
-		return sec_.num;
-	}
-	else if (str.compare("tertiary")==0)
-	{
-		ter_ = tacky;//.clone();
-//		cout << "tertiary set: " << ter_.num << endl;
-		return ter_.num;
-	}
-	else
-		return 0;
+	tags_.push_back(tacky);
+
+	return 0;
 }
 
 
@@ -352,37 +360,30 @@ int Map::update(string str, Mat m)
 int Map::purge(string str, string tacky)
 {
 	int n=0;
-	TagList *lister;
-	if (str.compare("primary")==0)
-	{
-		lister = &pri_;
-	}
-	else if (str.compare("secondary")==0)
-	{
-		lister = &sec_;
-	}
-	else if (str.compare("tertiary")==0)
-	{
-		lister = &ter_;
-	}
-	else
-	{
-		return n;
-	}
 
-	vector<Tag>::iterator head = lister->tags.begin();
-	vector<Tag>::iterator tail = lister->tags.end();
-
-	while (head != tail)
+	int numlists = tags_.size();
+	int iter;
+	for (iter=0; iter<numlists; iter++)
 	{
-		if (head->tag.compare(tacky)==0)
+		string iname = tags_.at(iter).name;
+		if (str.compare(iname)==0)
 		{
-			lister->tags.erase(head);
-			lister->num--;
-			n++;
+			vector<Tag>::iterator head = (tags_.at(iter)).tags.begin();
+			vector<Tag>::iterator tail = (tags_.at(iter)).tags.end();
+
+			while (head != tail)
+			{
+				if (head->tag.compare(tacky)==0)
+				{
+					tags_.at(iter).tags.erase(head);
+					tags_.at(iter).num--;
+					n++;
+				}
+				else
+					head++;
+			}
+			break;
 		}
-		else
-			head++;
 	}
 
 	return n;
@@ -392,6 +393,7 @@ int Map::purge(string str, string tacky)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int Map::remove(string str, string id)
 {
+/*
 	TagList *lister;
 	if (str.compare("primary")==0)
 	{
@@ -425,6 +427,8 @@ int Map::remove(string str, string id)
 	}
 
 	return lister->num;
+*/
+	return 0;
 }
 
 

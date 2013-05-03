@@ -239,7 +239,7 @@ private:
 //	TagList				ter_;		// Tertiary (auto-set) TagList
 
 public:
-	int update(string, TagList);
+	int update(TagList);
 	int update(string, Mat);
 //	int add(Tag);
 	int purge(string, string);

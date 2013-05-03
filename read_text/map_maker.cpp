@@ -32,7 +32,7 @@ int map_maker(void)
 	}
 
 
-	r = mapper.update("primary", *lister);
+	r = mapper.update(*lister);
 	assert( r == iter );
 
 
@@ -53,7 +53,7 @@ int map_maker(void)
 		lister->add(tagster);
 	}
 
-	r = mapper.update("secondary", *lister);
+	r = mapper.update(*lister);
 	assert( r == iter );
 
 
@@ -77,7 +77,7 @@ int map_maker(void)
 		lister->add(tagster);
 	}
 
-	r = mapper.update("tertiary", *lister);
+	r = mapper.update(*lister);
 	assert( r == iter );
 
 
